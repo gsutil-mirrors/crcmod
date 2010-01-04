@@ -302,6 +302,7 @@ crc = Crc(g32)
 str_rep = '''poly = 0x104C11DB7
 reverse = True
 initCrc  = 0xFFFFFFFF
+xorOut   = 0x00000000
 crcValue = 0xFFFFFFFF'''
 assert str(crc) == str_rep
 assert crc.digest() == b'\xff\xff\xff\xff'
@@ -317,8 +318,48 @@ assert x is not crc
 str_rep = '''poly = 0x104C11DB7
 reverse = True
 initCrc  = 0xFFFFFFFF
+xorOut   = 0x00000000
 crcValue = 0xF7B400A7'''
 assert str(crc) == str_rep
+assert str(x) == str_rep
+
+# Verify methods when using xorOut
+
+crc = Crc(g32, xorOut = ~0)
+
+str_rep = '''poly = 0x104C11DB7
+reverse = True
+initCrc  = 0xFFFFFFFF
+xorOut   = 0xFFFFFFFF
+crcValue = 0x00000000'''
+assert str(crc) == str_rep
+assert crc.digest() == b'\x00\x00\x00\x00'
+assert crc.hexdigest() == '00000000'
+
+crc.update(msg)
+assert crc.crcValue == 0x84BFF58
+assert crc.digest() == b'\x08\x4b\xff\x58'
+assert crc.hexdigest() == '084BFF58'
+
+x = crc.copy()
+assert x is not crc
+str_rep = '''poly = 0x104C11DB7
+reverse = True
+initCrc  = 0xFFFFFFFF
+xorOut   = 0xFFFFFFFF
+crcValue = 0x084BFF58'''
+assert str(crc) == str_rep
+assert str(x) == str_rep
+
+y = crc.new()
+assert y is not crc
+assert y is not x
+str_rep = '''poly = 0x104C11DB7
+reverse = True
+initCrc  = 0xFFFFFFFF
+xorOut   = 0xFFFFFFFF
+crcValue = 0x00000000'''
+assert str(y) == str_rep
 
 print('All tests PASS')
 

@@ -57,9 +57,9 @@ class Crc:
     hashlib module in the Python standard library.  See the documentation of
     this module for examples of how to use a Crc instance.
 
-    The string representation of a Crc instance identifies the polynomial and
-    the initial and current CRC values.  The print statement can be used to
-    output this information.
+    The string representation of a Crc instance identifies the polynomial,
+    initial value, XOR out value, and the current CRC value.  The print
+    statement can be used to output this information.
 
     If you need to generate a C/C++ function for use in another application,
     use the generateCode method.  If you need to generate code for another
@@ -78,19 +78,23 @@ class Crc:
 
     rev -- A flag that selects a bit reversed algorithm when True.  Defaults to
     True because the bit reversed algorithms are more efficient.
+
+    xorOut -- Final value to XOR with the calculated CRC value. Used by some
+    CRC algorithms. Defaults to zero.
     '''
-    def __init__(self, poly, initCrc=~0, rev=True, initialize=True):
+    def __init__(self, poly, initCrc=~0, rev=True, xorOut = 0, initialize=True):
         if not initialize:
             # Don't want to perform the initialization when using new or copy
             # to create a new instance.
             return
 
-        x = _mkCrcFun(poly, initCrc, rev)
+        x = _mkCrcFun(poly, initCrc, xorOut, rev)
         self._crc = x[0]
         self.digest_size = x[1]//8
         self.initCrc = x[2]
-        self.table = x[3]
-        self.crcValue = self.initCrc
+        self.xorOut = x[3]
+        self.table = x[4]
+        self.crcValue = self.initCrc ^ self.xorOut
         self.reverse = rev
         self.poly = poly
 
@@ -100,6 +104,7 @@ class Crc:
         lst.append('reverse = %s' % self.reverse)
         fmt = '0x%%0%dX' % (self.digest_size*2)
         lst.append('initCrc  = %s' % (fmt % self.initCrc))
+        lst.append('xorOut   = %s' % (fmt % self.xorOut))
         lst.append('crcValue = %s' % (fmt % self.crcValue))
         return '\n'.join(lst)
 
@@ -113,8 +118,9 @@ class Crc:
         n._crc = self._crc
         n.digest_size = self.digest_size
         n.initCrc = self.initCrc
+        n.xorOut = self.xorOut
         n.table = self.table
-        n.crcValue = self.initCrc
+        n.crcValue = self.initCrc ^ self.xorOut
         n.reverse = self.reverse
         n.poly = self.poly
         if arg is not None:
@@ -135,7 +141,7 @@ class Crc:
         '''Update the current CRC value using the string specified as the data
         parameter.
         '''
-        self.crcValue = self._crc(data, self.crcValue)
+        self.crcValue = self.xorOut ^ self._crc(data, self.xorOut ^ self.crcValue)
 
     def digest(self):
         '''Return the current CRC value as a string of bytes.  The length of
@@ -257,7 +263,7 @@ def mkCrcFun(poly, initCrc=~0, rev=True):
     def crcfun(data, crc=initCrc):
     '''
 
-    return _mkCrcFun(poly, initCrc, rev)[0]
+    return _mkCrcFun(poly, initCrc, 0, rev)[0]
 
 #-----------------------------------------------------------------------------
 # Naming convention:
@@ -366,14 +372,15 @@ del typeCode, size
 # returned function calls a low level function that is written in C if the
 # extension module could be loaded.  Otherwise, a Python implementation is
 # used.  In addition to this function, the size of the CRC, the initial CRC,
-# and a list containing the CRC table are returned.
+# the XOR-out value, and a list containing the CRC table are returned.
 
-def _mkCrcFun(poly, initCrc, rev):
+def _mkCrcFun(poly, initCrc, xorOut, rev):
     size = _verifyPoly(poly)
 
     # Adjust the initial CRC to the correct data type (unsigned value).
     mask = (1<<size) - 1
     initCrc = initCrc & mask
+    xorOut = xorOut & mask
 
     if rev:
         tableList = _mkTable_r(poly, size)
@@ -389,7 +396,7 @@ def _mkCrcFun(poly, initCrc, rev):
     def crcfun(data, crc=initCrc, table=_table, fun=_fun):
         return fun(data, crc, table)
 
-    return crcfun, size, initCrc, tableList
+    return crcfun, size, initCrc, xorOut, tableList
 
 #-----------------------------------------------------------------------------
 _codeTemplate = '''// Automatically generated CRC function
