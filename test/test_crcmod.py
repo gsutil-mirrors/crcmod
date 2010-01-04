@@ -342,9 +342,12 @@ initCrc  = 0xFFFFFFFF
 xorOut   = 0x00000000
 crcValue = 0xF7B400A7'''
 assert str(crc) == str_rep
+assert str(x) == str_rep
 
 # Verify methods when using xorOut
+
 crc = Crc(g32, xorOut=~0L)
+
 str_rep = '''poly = 0x104C11DB7
 reverse = True
 initCrc  = 0xFFFFFFFF
@@ -372,7 +375,6 @@ assert str(x) == str_rep
 y = crc.new()
 assert y is not crc
 assert y is not x
-print y
 str_rep = '''poly = 0x104C11DB7
 reverse = True
 initCrc  = 0xFFFFFFFF
