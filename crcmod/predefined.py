@@ -102,10 +102,21 @@ class PredefinedCrc(PredefinedCrcMixin, crcmod.Crc, object):
 Crc = PredefinedCrc
 
 
-if __name__ == '__main__':
+def _unit_tests():
     test1 = PredefinedCrc('crc-32')
     test1.update("123456789")
     print "Test1", test1.hexdigest()
     test2 = test1.new()
     test2.update("123456789")
     print "Test2", test2.hexdigest()
+
+    print "Testing check values for all algorithms"
+    for table_entry in _crc_definitions:
+        test = PredefinedCrc(table_entry['name'])
+        test.update("123456789")
+        if test.crcValue != table_entry['check']:
+            raise Exception("Check failed for '%s'" % table_entry['name'])
+        print "'%s' pass" % table_entry['name']
+
+if __name__ == '__main__':
+    _unit_tests()
