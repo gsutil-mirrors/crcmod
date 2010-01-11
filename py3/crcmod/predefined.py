@@ -78,7 +78,7 @@ _crc_definitions_by_name = {}
 _crc_definitions_by_identifier = {}
 _crc_definitions = []
 
-_crc_table_headings = [ 'name', 'identifier', 'poly', 'reverse', 'init', 'xor_out' ]
+_crc_table_headings = [ 'name', 'identifier', 'poly', 'reverse', 'init', 'xor_out', 'check' ]
 
 for table_entry in _crc_definitions_table:
     crc_definition = dict(zip(_crc_table_headings, table_entry))
