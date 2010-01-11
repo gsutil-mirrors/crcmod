@@ -23,8 +23,9 @@
 #-----------------------------------------------------------------------------
 
 from crcmod import mkCrcFun, Crc
-from crcmod.predefined import PredefinedCrc
 from crcmod.crcmod import _usingExtension
+from crcmod.predefined import PredefinedCrc
+from crcmod.predefined import _crc_definitions as _predefined_crc_definitions
 
 print '_usingExtension', _usingExtension
 
@@ -394,6 +395,12 @@ assert crc2.crcValue == 0x00000000
 crc2.update(msg)
 assert crc1.crcValue == 0x84BFF58L
 assert crc2.crcValue == 0x84BFF58L
+
+for table_entry in _predefined_crc_definitions:
+    test = PredefinedCrc(table_entry['name'])
+    test.update("123456789")
+    if test.crcValue != table_entry['check']:
+        raise Exception("Check failed for predefined algorithm '%s'" % table_entry['name'])
 
 print 'All tests PASS'
 
