@@ -23,6 +23,7 @@
 #-----------------------------------------------------------------------------
 
 from crcmod import mkCrcFun, Crc
+from crcmod.predefined import PredefinedCrc
 from crcmod.crcmod import _usingExtension
 
 print('_usingExtension', _usingExtension)
@@ -360,6 +361,18 @@ initCrc  = 0xFFFFFFFF
 xorOut   = 0xFFFFFFFF
 crcValue = 0x00000000'''
 assert str(y) == str_rep
+
+#-----------------------------------------------------------------------------
+# Verify the predefined CRCs
+crc1 = PredefinedCrc('crc-32')
+crc1.update(msg)
+assert crc1.crcValue == 0x84BFF58
+crc2 = crc1.new()
+assert crc1.crcValue == 0x84BFF58
+assert crc2.crcValue == 0x00000000
+crc2.update(msg)
+assert crc1.crcValue == 0x84BFF58
+assert crc2.crcValue == 0x84BFF58
 
 print('All tests PASS')
 
