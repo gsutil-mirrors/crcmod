@@ -88,15 +88,19 @@ class Crc:
             # to create a new instance.
             return
 
-        x = _mkCrcFun(poly, initCrc, xorOut, rev)
-        self._crc = x[0]
-        self.digest_size = x[1]//8
-        self.initCrc = x[2]
-        self.xorOut = x[3]
-        self.table = x[4]
-        self.crcValue = self.initCrc ^ self.xorOut
-        self.reverse = rev
+        (sizeBits, initCrc, xorOut) = _verifyParams(poly, initCrc, xorOut)
+        self.digest_size = sizeBits//8
+        self.initCrc = initCrc
+        self.xorOut = xorOut
+
         self.poly = poly
+        self.reverse = rev
+
+        (crcfun, table) = _mkCrcFun(poly, sizeBits, initCrc, rev)
+        self._crc = crcfun
+        self.table = table
+
+        self.crcValue = self.initCrc ^ self.xorOut
 
     def __str__(self):
         lst = []
@@ -263,7 +267,10 @@ def mkCrcFun(poly, initCrc=~0, rev=True):
     def crcfun(data, crc=initCrc):
     '''
 
-    return _mkCrcFun(poly, initCrc, 0, rev)[0]
+    # First we must verify the params
+    (sizeBits, initCrc) = _verifyParams(poly, initCrc)
+    # Make the function (and table), return the function
+    return _mkCrcFun(poly, sizeBits, initCrc, rev)[0]
 
 #-----------------------------------------------------------------------------
 # Naming convention:
@@ -368,35 +375,55 @@ _sizeToTypeCode[24] = _sizeToTypeCode[32]
 del typeCode, size
 
 #-----------------------------------------------------------------------------
-# The following function returns a Python function to compute the CRC.  The
-# returned function calls a low level function that is written in C if the
-# extension module could be loaded.  Otherwise, a Python implementation is
-# used.  In addition to this function, the size of the CRC, the initial CRC,
-# the XOR-out value, and a list containing the CRC table are returned.
+# The following function validates the parameters of the CRC, namely,
+# poly, and initial/final XOR values.
+# It returns the size of the CRC (in bits), and "sanitized" initial/final XOR values.
 
-def _mkCrcFun(poly, initCrc, xorOut, rev):
-    size = _verifyPoly(poly)
+def _verifyParams(poly, initCrc, xorOut=None):
+    sizeBits = _verifyPoly(poly)
 
+    # First return value is the poly size (in bits)
+    out = [sizeBits]
+
+    mask = (1<<sizeBits) - 1
     # Adjust the initial CRC to the correct data type (unsigned value).
-    mask = (1<<size) - 1
     initCrc = initCrc & mask
-    xorOut = xorOut & mask
+    out.append(initCrc)
+    # Similar for XOR-out value.
+    if xorOut != None:
+        xorOut = xorOut & mask
+        out.append(xorOut)
+    return out
 
+
+#-----------------------------------------------------------------------------
+# The following function returns a Python function to compute the CRC.
+#
+# It must be passed parameters that are already verified & sanitized by
+# _verifyParams().
+#
+# The returned function calls a low level function that is written in C if the
+# extension module could be loaded.  Otherwise, a Python implementation is
+# used.
+#
+# In addition to this function, a list containing the CRC table is returned.
+
+def _mkCrcFun(poly, sizeBits, initCrc, rev):
     if rev:
-        tableList = _mkTable_r(poly, size)
-        _fun = _sizeMap[size][1]
+        tableList = _mkTable_r(poly, sizeBits)
+        _fun = _sizeMap[sizeBits][1]
     else:
-        tableList = _mkTable(poly, size)
-        _fun = _sizeMap[size][0]
+        tableList = _mkTable(poly, sizeBits)
+        _fun = _sizeMap[sizeBits][0]
 
     _table = tableList
     if _usingExtension:
-        _table = struct.pack(_sizeToTypeCode[size], *tableList)
+        _table = struct.pack(_sizeToTypeCode[sizeBits], *tableList)
 
     def crcfun(data, crc=initCrc, table=_table, fun=_fun):
         return fun(data, crc, table)
 
-    return crcfun, size, initCrc, xorOut, tableList
+    return crcfun, tableList
 
 #-----------------------------------------------------------------------------
 _codeTemplate = '''// Automatically generated CRC function

@@ -88,7 +88,7 @@ class Crc:
             return
 
         (sizeBits, initCrc, xorOut) = _verifyParams(poly, initCrc, xorOut)
-        self.digest_size = (sizeBits + 7)//8       # + 7 to round up the division result (ceiling)
+        self.digest_size = sizeBits//8
         self.initCrc = initCrc
         self.xorOut = xorOut
 
@@ -268,6 +268,7 @@ def mkCrcFun(poly, initCrc=~0L, rev=True):
 
     # First we must verify the params
     (sizeBits, initCrc) = _verifyParams(poly, initCrc)
+    # Make the function (and table), return the function
     return _mkCrcFun(poly, sizeBits, initCrc, rev)[0]
 
 #-----------------------------------------------------------------------------
@@ -386,30 +387,34 @@ del typeCode, size
 
 #-----------------------------------------------------------------------------
 # The following function validates the parameters of the CRC, namely,
-# poly, and any initial/final XOR values given.
-# *args contains any variable number of initial/final XOR values given.
-# It returns the size of the CRC (in bits), and "sanitised" initial/final XOR values.
+# poly, and initial/final XOR values.
+# It returns the size of the CRC (in bits), and "sanitized" initial/final XOR values.
 
-def _verifyParams(poly, *args):
+def _verifyParams(poly, initCrc, xorOut=None):
     sizeBits = _verifyPoly(poly)
 
     # First return value is the poly size (in bits)
     out = [sizeBits]
 
-    # Adjust the initial CRC to the correct data type (unsigned value).
     mask = (1L<<sizeBits) - 1
-    for item in args:
-        item = long(item) & mask
+    # Adjust the initial CRC to the correct data type (unsigned value).
+    initCrc = long(initCrc) & mask
+    if mask <= sys.maxint:
+        initCrc = int(initCrc)
+    out.append(initCrc)
+    # Similar for XOR-out value.
+    if xorOut != None:
+        xorOut = long(xorOut) & mask
         if mask <= sys.maxint:
-            item = int(item)
-        out.append(item)
+            xorOut = int(xorOut)
+        out.append(xorOut)
     return out
 
 
 #-----------------------------------------------------------------------------
 # The following function returns a Python function to compute the CRC.
 #
-# It must be passed parameters that are already verified & sanitised by
+# It must be passed parameters that are already verified & sanitized by
 # _verifyParams().
 #
 # The returned function calls a low level function that is written in C if the
