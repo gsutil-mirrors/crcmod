@@ -90,7 +90,7 @@ for table_entry in _crc_definitions_table:
     _crc_definitions_by_identifier[table_entry[1]] = crc_definition
 
 
-class PredefinedCrcMixin(crcmod.Crc):
+class PredefinedCrc(crcmod.Crc):
     def __init__(self, crc_name):
         definition = _crc_definitions_by_name.get(simplify_name(crc_name), None)
         if not definition:
