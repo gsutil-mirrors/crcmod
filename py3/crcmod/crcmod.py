@@ -82,7 +82,7 @@ class Crc:
     xorOut -- Final value to XOR with the calculated CRC value. Used by some
     CRC algorithms. Defaults to zero.
     '''
-    def __init__(self, poly, initCrc=~0, rev=True, xorOut = 0, initialize=True):
+    def __init__(self, poly, initCrc=~0, rev=True, xorOut=0, initialize=True):
         if not initialize:
             # Don't want to perform the initialization when using new or copy
             # to create a new instance.
@@ -96,11 +96,11 @@ class Crc:
         self.poly = poly
         self.reverse = rev
 
-        (crcfun, table) = _mkCrcFun(poly, sizeBits, initCrc, rev)
+        (crcfun, table) = _mkCrcFun(poly, sizeBits, initCrc, rev, xorOut)
         self._crc = crcfun
         self.table = table
 
-        self.crcValue = self.initCrc ^ self.xorOut
+        self.crcValue = self.initCrc
 
     def __str__(self):
         lst = []
@@ -124,7 +124,7 @@ class Crc:
         n.initCrc = self.initCrc
         n.xorOut = self.xorOut
         n.table = self.table
-        n.crcValue = self.initCrc ^ self.xorOut
+        n.crcValue = self.initCrc
         n.reverse = self.reverse
         n.poly = self.poly
         if arg is not None:
@@ -145,7 +145,7 @@ class Crc:
         '''Update the current CRC value using the string specified as the data
         parameter.
         '''
-        self.crcValue = self.xorOut ^ self._crc(data, self.xorOut ^ self.crcValue)
+        self.crcValue = self._crc(data, self.crcValue)
 
     def digest(self):
         '''Return the current CRC value as a string of bytes.  The length of
@@ -256,7 +256,7 @@ class Crc:
         out.write(_codeTemplate % parms) 
 
 #-----------------------------------------------------------------------------
-def mkCrcFun(poly, initCrc=~0, rev=True):
+def mkCrcFun(poly, initCrc=~0, rev=True, xorOut=0):
     '''Return a function that computes the CRC using the specified polynomial.
 
     poly -- integer representation of the generator polynomial
@@ -268,9 +268,9 @@ def mkCrcFun(poly, initCrc=~0, rev=True):
     '''
 
     # First we must verify the params
-    (sizeBits, initCrc) = _verifyParams(poly, initCrc)
+    (sizeBits, initCrc, xorOut) = _verifyParams(poly, initCrc, xorOut)
     # Make the function (and table), return the function
-    return _mkCrcFun(poly, sizeBits, initCrc, rev)[0]
+    return _mkCrcFun(poly, sizeBits, initCrc, rev, xorOut)[0]
 
 #-----------------------------------------------------------------------------
 # Naming convention:
@@ -408,7 +408,7 @@ def _verifyParams(poly, initCrc, xorOut=None):
 #
 # In addition to this function, a list containing the CRC table is returned.
 
-def _mkCrcFun(poly, sizeBits, initCrc, rev):
+def _mkCrcFun(poly, sizeBits, initCrc, rev, xorOut):
     if rev:
         tableList = _mkTable_r(poly, sizeBits)
         _fun = _sizeMap[sizeBits][1]
@@ -420,8 +420,12 @@ def _mkCrcFun(poly, sizeBits, initCrc, rev):
     if _usingExtension:
         _table = struct.pack(_sizeToTypeCode[sizeBits], *tableList)
 
-    def crcfun(data, crc=initCrc, table=_table, fun=_fun):
-        return fun(data, crc, table)
+    if xorOut == 0:
+        def crcfun(data, crc=initCrc, table=_table, fun=_fun):
+            return fun(data, crc, table)
+    else:
+        def crcfun(data, crc=initCrc, table=_table, fun=_fun):
+            return xorOut ^ fun(data, xorOut ^ crc, table)
 
     return crcfun, tableList
 
