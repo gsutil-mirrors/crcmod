@@ -72,15 +72,18 @@ class Crc:
     coefficients of the polynomial.  The only polynomials allowed are those
     that generate 8, 16, 24, 32, or 64 bit CRCs.
 
-    initCrc -- Initial value used to start the CRC calculation.  Defaults to
-    all bits set because that starting value will take leading zero bytes into
-    account.  Starting with zero will ignore all leading zero bytes.
+    initCrc -- Initial value used to start the CRC calculation.  This initial
+    value should be the initial shift register value XORed with the final XOR
+    value.  That is equivalent to the CRC result the algorithm should return for
+    a zero-length string.  Defaults to all bits set because that starting value
+    will take leading zero bytes into account.  Starting with zero will ignore
+    all leading zero bytes.
 
     rev -- A flag that selects a bit reversed algorithm when True.  Defaults to
     True because the bit reversed algorithms are more efficient.
 
-    xorOut -- Final value to XOR with the calculated CRC value. Used by some
-    CRC algorithms. Defaults to zero.
+    xorOut -- Final value to XOR with the calculated CRC value.  Used by some
+    CRC algorithms.  Defaults to zero.
     '''
     def __init__(self, poly, initCrc=~0, rev=True, xorOut=0, initialize=True):
         if not initialize:
@@ -262,6 +265,7 @@ def mkCrcFun(poly, initCrc=~0, rev=True, xorOut=0):
     poly -- integer representation of the generator polynomial
     initCrc -- default initial CRC value
     rev -- when true, indicates that the data is processed bit reversed.
+    xorOut -- the final XOR value
 
     The returned function has the following user interface
     def crcfun(data, crc=initCrc):
