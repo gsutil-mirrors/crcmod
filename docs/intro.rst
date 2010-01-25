@@ -111,14 +111,14 @@ of Linux with the 2.6.6 version of the kernel.  The Python version was 2.3.3.
 The following result was obtained by running the :file:`timing_test.py` script twice.
 Once with the Python version and once with the extension module.
 
-======  ========  ========  ==============================
-Module  min (µs)  max (µs)  Notes
-======  ========  ========  ==============================
-CRC     14981.4   15035.8   Pure Python implementation
-CRC     64.2      64.4      C extension module
-md5     59.0      59.3
-crc32   87.2      87.4
-======  ========  ========  ==============================
+======================  ============  ============  ==============================
+Module                  min (µs)      max (µs)      Notes
+======================  ============  ============  ==============================
+:mod:`crcmod`           14981.4       15035.8       Pure Python implementation
+:mod:`crcmod`           64.2          64.4          C extension module
+:mod:`md5`              59.0          59.3        
+:func:`binascii.crc32`  87.2          87.4        
+======================  ============  ============  ==============================
 
 * Timing in microseconds per iteration
 * min and max of 10 repetitions
