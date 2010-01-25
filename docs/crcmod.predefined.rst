@@ -1,0 +1,127 @@
+
+:mod:`crcmod.predefined` -- CRC calculation using predefined algorithms
+=======================================================================
+
+.. module:: crcmod.predefined
+   :synopsis: CRC calculation using predefined algorithms
+.. moduleauthor:: Craig McQueen
+.. sectionauthor:: Craig McQueen
+
+This module provides a function factory :func:`mkCrcFun` and a class :class:`Crc`
+for calculating CRCs of byte strings using common predefined CRC algorithms.
+
+The function factory and the class are very similar to those defined in :mod:`crcmod`,
+except that the CRC algorithm is specified by a predefined name, rather than the
+individual polynomial, reflection, and initial and final-XOR parameters.
+
+Predefined CRC algorithms
+-------------------------
+
+The :mod:`crcmod.predefined` module offers the following predefined algorithms:
+
+================================  ======================  ==============  ====================  ====================  ====================
+Name                              Poly                    Reverse         Init-value            XOR-out               Check
+================================  ======================  ==============  ====================  ====================  ====================
+``crc-8``                         0x107                   NON_REVERSE     0x00                  0x00                  0xF4
+
+``crc-16``                        0x18005                 REVERSE         0x0000                0x0000                0xBB3D
+``crc-16-usb``                    0x18005                 REVERSE         0x0000                0xFFFF                0xB4C8
+``x-25``                          0x11021                 REVERSE         0x0000                0xFFFF                0x906E
+``xmodem``                        0x11021                 NON_REVERSE     0x0000                0x0000                0x31C3
+``modbus``                        0x18005                 REVERSE         0xFFFF                0x0000                0x4B37
+
+``kermit`` [#ccitt]_              0x11021                 REVERSE         0x0000                0x0000                0x2189
+``crc-ccitt-false`` [#ccitt]_     0x11021                 NON_REVERSE     0xFFFF                0x0000                0x29B1
+``crc-aug-ccitt`` [#ccitt]_       0x11021                 NON_REVERSE     0x1D0F                0x0000                0xE5CC
+
+``crc-24``                        0x1864CFB               NON_REVERSE     0xB704CE              0x000000              0x21CF02
+
+``crc-32``                        0x104c11db7             REVERSE         0x00000000            0xFFFFFFFF            0xCBF43926
+``crc-32c``                       0x11edc6f41             REVERSE         0x00000000            0xFFFFFFFF            0xE3069283
+``crc-32-mpeg``                   0x104c11db7             NON_REVERSE     0xFFFFFFFF            0x00000000            0x0376E6E7
+``posix``                         0x104c11db7             NON_REVERSE     0xFFFFFFFF            0xFFFFFFFF            0x765E7680
+
+``crc-64``                        0x1000000000000001B     REVERSE         0x0000000000000000    0x0000000000000000    0x46A5A9388A5BEFFE
+``crc-64-jones``                  0x1ad93d23594c935a9     REVERSE         0x0000000000000000    0x0000000000000000    0xE9C6D914C4B8D9CA
+================================  ======================  ==============  ====================  ====================  ====================
+
+.. rubric:: Notes
+
+.. [#ccitt] Definitions of CCITT are disputable. See:
+
+    * http://homepages.tesco.net/~rainstorm/crc-catalogue.htm
+    * http://web.archive.org/web/20071229021252/http://www.joegeluso.com/software/articles/ccitt.htm
+
+:func:`mkCrcFun` -- CRC function factory
+----------------------------------------
+
+The function factory provides a simple interface for CRC calculation.
+
+.. function:: mkCrcFun(crc_name)
+
+   Function factory that returns a new function for calculating CRCs
+   using a specified CRC algorithm.
+
+   :param crc_name: The name of the predefined CRC algorithm to use.
+   :type crc_name:  string
+
+   The function that is returned is the same as that returned by :func:`crcmod.mkCrcFun`:
+   
+   .. function:: crc(data[, crc=initCrc])
+
+   :param data:     Data for which to calculate the CRC.
+   :type data:      byte string
+
+   :param crc:      Initial CRC value.
+
+   :return:         Calculated CRC value.
+
+Examples
+^^^^^^^^
+
+**CRC-32** example::
+
+   >>> import crcmod.predefined
+   
+   >>> crc32_func = crcmod.predefined.mkCrcFun('crc-32')
+   >>> hex(crc32_func('123456789'))
+   '0xcbf43926L'
+
+**XMODEM** example::
+
+   >>> xmodem_crc_func = crcmod.predefined.mkCrcFun('xmodem')
+   >>> hex(xmodem_crc_func('123456789'))
+   '0x31c3'
+
+
+Class :class:`Crc`
+------------------
+
+The class provides an interface similar to the Python :mod:`md5` and :mod:`hashlib` modules.
+
+This class is inherited from the :class:`crcmod.Crc` class, and is the same except for the
+initialization.
+
+.. class:: Crc(poly[, initCrc, rev, xorOut])
+
+   Returns a new :class:`Crc` object for calculating CRCs using a specified CRC algorithm.
+   
+   The parameter is the same as that for the factory function :func:`crcmod.predefined.mkCrcFun`.
+
+   :param crc_name: The name of the predefined CRC algorithm to use.
+   :type crc_name:  string
+
+
+Examples
+^^^^^^^^
+
+**CRC-32** Example::
+
+   >>> import crcmod.predefined
+   
+   >>> crc32 = crcmod.predefined.Crc('crc-32')
+   >>> crc32.update('123456789')
+   >>> hex(crc32.crcValue)
+   '0xcbf43926L'
+   >>> crc32.hexdigest()
+   'CBF43926'
