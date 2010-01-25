@@ -84,7 +84,7 @@ The CRC function can be called multiple times. On subsequent calls, pass the CRC
 Class :class:`Crc`
 ------------------
 
-The class provides an interface similar to the Python :mod:`md5` and :mod:`hashlib` modules.
+The class provides an interface similar to the Python :mod:`hashlib`, :mod:`md5` and :mod:`sha` modules.
 
 .. class:: Crc(poly[, initCrc, rev, xorOut])
 
@@ -109,6 +109,18 @@ The class provides an interface similar to the Python :mod:`md5` and :mod:`hashl
 
    :param xorOut:  Final value to XOR with the calculated CRC value.  Used by some
                    CRC algorithms.  Defaults to zero.
+
+   :class:`Crc` objects contain the following constant values:
+
+   .. attribute:: digest_size
+
+      The size of the resulting digest in bytes. This depends on the width of the CRC polynomial.
+      E.g. for a 32-bit CRC, :data:`digest_size` will be ``4``.
+
+   .. attribute:: crcValue
+
+      The calculated CRC value, as an integer, for the data that has been input
+      using :meth:`update`. This value is updated after each call to :meth:`update`.
 
    :class:`Crc` objects support the following methods:
 

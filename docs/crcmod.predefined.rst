@@ -7,7 +7,7 @@
 .. moduleauthor:: Craig McQueen
 .. sectionauthor:: Craig McQueen
 
-This module provides a function factory :func:`mkCrcFun` and a class :class:`Crc`
+This module provides a function factory :func:`mkPredefinedCrcFun` and a class :class:`PredefinedCrc`
 for calculating CRCs of byte strings using common predefined CRC algorithms.
 
 The function factory and the class are very similar to those defined in :mod:`crcmod`,
@@ -55,7 +55,9 @@ Name                              Poly                    Reversed?   Init-value
 :func:`mkPredefinedCrcFun` -- CRC function factory
 --------------------------------------------------
 
-The function factory provides a simple interface for CRC calculation.
+The function factory provides a simple interface for CRC calculation. It is similar
+to :func:`crcmod.mkCrcFun`, except that it specifies a CRC algorithm by name rather
+than its parameters.
 
 .. function:: mkPredefinedCrcFun(crc_name)
 
@@ -107,13 +109,13 @@ Class :class:`PredefinedCrc`
 The class provides an interface similar to the Python :mod:`md5` and :mod:`hashlib` modules.
 
 This class is inherited from the :class:`crcmod.Crc` class, and is the same except for the
-initialization.
+initialization.  It specifies a CRC algorithm by name rather than its parameters.
 
-.. class:: PredefinedCrc(poly[, initCrc, rev, xorOut])
+.. class:: PredefinedCrc(crc_name)
 
    Returns a new :class:`Crc` object for calculating CRCs using a specified CRC algorithm.
    
-   The parameter is the same as that for the factory function :func:`crcmod.predefined.mkCrcFun`.
+   The parameter is the same as that for the factory function :func:`crcmod.predefined.mkPredefinedCrcFun`.
 
    :param crc_name: The name of the predefined CRC algorithm to use.
    :type crc_name:  string
