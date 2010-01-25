@@ -67,6 +67,9 @@ than its parameters.
    :param crc_name: The name of the predefined CRC algorithm to use.
    :type crc_name:  string
 
+   :return:         CRC calculation function
+   :rtype:          function
+
    The function that is returned is the same as that returned by :func:`crcmod.mkCrcFun`:
    
    .. function:: .crc_function(data[, crc=initCrc])
@@ -77,10 +80,11 @@ than its parameters.
    :param crc:      Initial CRC value.
 
    :return:         Calculated CRC value.
+   :rtype:          integer
 
 .. function:: mkCrcFun(crc_name)
 
-   This is an alias for :func:`mkPredefinedCrcFun`. However, it is not defined when
+   This is an alias for :func:`crcmod.predefined.mkPredefinedCrcFun`. However, it is not defined when
    :mod:`crcmod.predefined` is imported using the form::
    
        >>> from crcmod.predefined import *
@@ -106,8 +110,6 @@ Examples
 Class :class:`PredefinedCrc`
 ----------------------------
 
-The class provides an interface similar to the Python :mod:`md5` and :mod:`hashlib` modules.
-
 This class is inherited from the :class:`crcmod.Crc` class, and is the same except for the
 initialization.  It specifies a CRC algorithm by name rather than its parameters.
 
@@ -122,7 +124,7 @@ initialization.  It specifies a CRC algorithm by name rather than its parameters
 
 .. class:: Crc(poly[, initCrc, rev, xorOut])
 
-   This is an alias for :class:`PredefinedCrc`. However, it is not defined when
+   This is an alias for :class:`crcmod.predefined.PredefinedCrc`. However, it is not defined when
    :mod:`crcmod.predefined` is imported using the form::
    
        >>> from crcmod.predefined import *

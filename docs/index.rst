@@ -6,9 +6,7 @@
 crcmod documentation
 ====================
 
-This is the documentation for the crcmod Python library.
-
-Contents:
+This is the documentation for the :mod:`crcmod` Python library.
 
 .. toctree::
    :maxdepth: 2
@@ -17,10 +15,6 @@ Contents:
    crcmod.rst
    crcmod.predefined.rst
 
-Indices and tables
-==================
-
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

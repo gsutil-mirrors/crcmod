@@ -1,9 +1,13 @@
 
+============
 Introduction
 ============
 
 The software in this package is a Python module for generating objects that
-compute the Cyclic Redundancy Check (CRC).  There is no attempt in this package
+compute the Cyclic Redundancy Check (CRC).  It includes a (optional) C extension
+for fast calculation, as well as a pure Python implementation.
+
+There is no attempt in this package
 to explain how the CRC works.  There are a number of resources on the web that
 give a good explanation of the algorithms.  Just do a Google search for "crc
 calculation" and browse till you find what you need.  Another resource can be
@@ -16,6 +20,7 @@ generate a Python function for the selected polynomial or an instance of the
 library.  A :class:`crcmod.Crc` class instance can also generate C/C++ source
 code that can be used in another application.
 
+----------
 Guidelines
 ----------
 
@@ -43,6 +48,7 @@ If you need to generate code for another language, I suggest you subclass the
 :class:`crcmod.Crc` class and replace the method :meth:`crcmod.Crc.generateCode`.  Use
 :meth:`crcmod.Crc.generateCode` as a model for the new version.
 
+------------
 Dependencies
 ------------
 
@@ -69,26 +75,30 @@ Building C extension
 To build the C extension, the appropriate compiler tools for your platform must be installed.
 Refer to the Python documentation for building C extensions for details.
 
+------------
 Installation
 ------------
 
-The crcmod package is installed using distutils.  If you have the tools
-installed to build a Python extension module, run the following command.
+The :mod:`crcmod` package is installed using :mod:`distutils`.  If you have the tools
+installed to build a Python extension module, run the following command::
 
-   ``python setup.py install``
+   python setup.py install
 
 If you don't have the tools to build an extension module, you will need to
-install the pure Python version using the following command.
+install the pure Python version using the following command::
 
-   ``python setup_py.py install``
+   python setup_py.py install
 
 .. note:: The version for Python 3.x is in the :file:`py3` directory.  The install process
       is the same but you need to use the Python 3.x interpreter.
 
+------------
 Unit Testing
 ------------
 
-The script :file:`test_crcmod.py` is the unit test for crcmod.  When you first install
+Tests are in the ``test`` sub-directory.
+
+The script :file:`test_crcmod.py` is the unit test for :mod:`crcmod`.  When you first install
 the package, you should run this test to make sure everything is installed
 properly.  This script performs a number of tests including a comparison to the
 direct method which uses a class implementing polynomials over the integers
@@ -98,6 +108,7 @@ The unit test script also demonstrates how to use the code generator.  The
 result of this is written out to the file :file:`examples.c`.  The generated code was
 checked to make sure it compiles with the GCC compiler.
 
+------
 Timing
 ------
 
@@ -134,6 +145,34 @@ and CRC took about the same amount of time.
       order byte of a 32-bit word.  A cast is used in the CRC module to accomplish
       the same thing.
 
+-------
+License
+-------
+
+The :mod:`crcmod` module is released under the MIT license:
+
+   Copyright (c) 2009  Raymond L. Buvel
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+
+----------
 References
 ----------
 
