@@ -10,6 +10,12 @@
 This module provides a function factory :func:`mkCrcFun` and a class :class:`Crc`
 for calculating CRCs of byte strings using common CRC algorithms.
 
+.. note:: This documentation is for Python 2.x usage. Python 3.x usage is very similar,
+    with the main difference that input strings must be explicitly defined as
+    :keyword:`bytes` type. E.g.::
+
+       crc_value = crc_function(b'123456789')
+
 :func:`mkCrcFun` -- CRC function factory
 ----------------------------------------
 
@@ -40,7 +46,7 @@ The function factory provides a simple interface for CRC calculation.
 
    The function that is returned is as follows:
    
-   .. function:: crc(data[, crc=initCrc])
+   .. function:: .crc_function(data[, crc=initCrc])
 
    :param data:     Data for which to calculate the CRC.
    :type data:      byte string
@@ -176,17 +182,3 @@ The :meth:`Crc.update` method can be called multiple times, and the CRC value is
    >>> crc32new.update('56789')
    >>> crc32new.hexdigest()
    'CBF43926'
-
-References
-----------
-
-.. seealso::
-
-   Module :mod:`hashlib`
-      Secure hash and message digest algorithms.
-
-   Module :mod:`md5`
-      RSA's MD5 message digest algorithm.
-
-   Module :mod:`hmac`
-      Keyed-hashing for message authentication.

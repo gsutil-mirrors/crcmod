@@ -1,0 +1,158 @@
+
+Introduction
+============
+
+The software in this package is a Python module for generating objects that
+compute the Cyclic Redundancy Check (CRC).  There is no attempt in this package
+to explain how the CRC works.  There are a number of resources on the web that
+give a good explanation of the algorithms.  Just do a Google search for "crc
+calculation" and browse till you find what you need.  Another resource can be
+found in chapter 20 of the book "Numerical Recipes in C" by Press et. al.
+
+This package allows the use of any 8, 16, 24, 32, or 64 bit CRC.  You can
+generate a Python function for the selected polynomial or an instance of the
+:class:`crcmod.Crc` class which provides the same interface as the
+:mod:`hashlib`, :mod:`md5` and :mod:`sha` modules from the Python standard
+library.  A :class:`crcmod.Crc` class instance can also generate C/C++ source
+code that can be used in another application.
+
+Guidelines
+----------
+
+If you are simply looking for something to compute a strong checksum (typically
+referred to as a message digest) over some data, I strongly suggest you use the
+:mod:`md5` module.  As shown in the timing study below, the MD5 algorithm has about
+the same performance as a 32-bit CRC generated with this module.  In addition,
+MD5 is a cryptographically strong message digest.  As discussed in :rfc:`1321`,
+the probability of having the same digest for two data sets is 2\ :sup:`-64` which is
+the same as a 64-bit CRC.  A CRC can be fooled into generating the same value
+by simply adding any multiple of the generator polynomial to the original
+message.  This is very difficult to do with the MD5 algorithm.
+
+If you are still interested in this module, you have an application that
+requires the use of a CRC.  Documentation is available here as well as
+from the doc strings.
+
+It is up to you to decide what polynomials to use in your application.  Some common
+CRC algorithms are predefined in :mod:`crcmod.predefined`.  If someone has not
+specified the polynomials to use, you will need to do some research to find one
+suitable for your application.  Examples are available in the unit test script
+:file:`test_crcmod.py` and the timing script :file:`timing_test.py`.
+
+If you need to generate code for another language, I suggest you subclass the
+:class:`crcmod.Crc` class and replace the method :meth:`crcmod.Crc.generateCode`.  Use
+:meth:`crcmod.Crc.generateCode` as a model for the new version.
+
+Dependencies
+------------
+
+Python Version
+^^^^^^^^^^^^^^
+
+The module has separate code to support the 2.x and 3.x Python series.
+
+For the 2.x versions of Python, these versions have been tested:
+
+* 2.4
+* 2.5
+* 2.6
+
+It may still work on earlier versions of Python 2.x, but these have not been recently tested.
+
+For the 3.x versions of Python, these versions have been tested:
+
+* 3.1
+
+Building C extension
+^^^^^^^^^^^^^^^^^^^^
+
+To build the C extension, the appropriate compiler tools for your platform must be installed.
+Refer to the Python documentation for building C extensions for details.
+
+Installation
+------------
+
+The crcmod package is installed using distutils.  If you have the tools
+installed to build a Python extension module, run the following command.
+
+   ``python setup.py install``
+
+If you don't have the tools to build an extension module, you will need to
+install the pure Python version using the following command.
+
+   ``python setup_py.py install``
+
+.. note:: The version for Python 3.x is in the :file:`py3` directory.  The install process
+      is the same but you need to use the Python 3.x interpreter.
+
+Unit Testing
+------------
+
+The script :file:`test_crcmod.py` is the unit test for crcmod.  When you first install
+the package, you should run this test to make sure everything is installed
+properly.  This script performs a number of tests including a comparison to the
+direct method which uses a class implementing polynomials over the integers
+mod 2.
+
+The unit test script also demonstrates how to use the code generator.  The
+result of this is written out to the file :file:`examples.c`.  The generated code was
+checked to make sure it compiles with the GCC compiler.
+
+Timing
+------
+
+A few timing measurements were taken using the :mod:`timeit` module in the Python
+standard library.  The Python implementation is compared to the extension
+module, the :mod:`md5` module in the standard library, and the :func:`binascii.crc32` function from the
+:mod:`binascii` module.  These measurements were taken on my development system which
+is a 3GHz Pentium IV with hyper threading running the Debian Sarge distribution
+of Linux with the 2.6.6 version of the kernel.  The Python version was 2.3.3.
+
+The following result was obtained by running the :file:`timing_test.py` script twice.
+Once with the Python version and once with the extension module.
+
+======  ========  ========  ==============================
+Module  min (µs)  max (µs)  Notes
+======  ========  ========  ==============================
+CRC     14981.4   15035.8   Pure Python implementation
+CRC     64.2      64.4      C extension module
+md5     59.0      59.3
+crc32   87.2      87.4
+======  ========  ========  ==============================
+
+* Timing in microseconds per iteration
+* min and max of 10 repetitions
+
+It is interesting that on this system, the :mod:`md5` module is slightly faster than a
+32-bit CRC even though the message digest is 128-bits and is cryptographically
+more secure.  This is surprising since the MD5 code looks a lot more complex.
+I tried unrolling the inner loop and using the function interface instead of
+the class interface.  These changes only got the result down to where the MD5
+and CRC took about the same amount of time.
+
+.. note:: :func:`binascii.crc32` is slower because it includes a mask operation to get the low
+      order byte of a 32-bit word.  A cast is used in the CRC module to accomplish
+      the same thing.
+
+References
+----------
+
+.. seealso::
+
+   :func:`binascii.crc32` function from the :mod:`binascii` module
+      CRC-32 implementation
+   
+   :func:`zlib.crc32` function from the :mod:`zlib` module
+      CRC-32 implementation
+
+   Module :mod:`hashlib`
+      Secure hash and message digest algorithms.
+
+   Module :mod:`md5`
+      RSA's MD5 message digest algorithm.
+
+   Module :mod:`sha`
+      NIST's secure hash algorithm, SHA.
+
+   Module :mod:`hmac`
+      Keyed-hashing for message authentication.
