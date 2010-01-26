@@ -1,7 +1,8 @@
 #-----------------------------------------------------------------------------
 # Test script for crcmod.
 #
-# Copyright (c) 2009  Raymond L. Buvel
+# Copyright (c) 2010  Raymond L. Buvel
+# Copyright (c) 2010  Craig McQueen
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -419,6 +420,13 @@ Crc(g32, rev=False).generateCode('crc32',out)
 Crc(g32, rev=True).generateCode('crc32r',out)
 Crc(g64b, rev=False).generateCode('crc64',out)
 Crc(g64b, rev=True).generateCode('crc64r',out)
+
+# Check out the XOR-out feature.
+Crc(g16, initCrc=0, rev=True, xorOut=~0).generateCode('crc16x',out)
+Crc(g24, initCrc=0, rev=True, xorOut=~0).generateCode('crc24x',out)
+Crc(g32, initCrc=0, rev=True, xorOut=~0).generateCode('crc32x',out)
+Crc(g64b, initCrc=0, rev=True, xorOut=~0).generateCode('crc64x',out)
+
 out.close()
 print('Done')
 

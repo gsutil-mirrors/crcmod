@@ -1,5 +1,6 @@
 #-----------------------------------------------------------------------------
-# Copyright (c) 2004  Raymond L. Buvel
+# Copyright (c) 2010  Raymond L. Buvel
+# Copyright (c) 2010  Craig McQueen
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -234,15 +235,21 @@ class Crc:
         if self.reverse:
             poly = poly + ', bit reverse algorithm'
 
-        preCondition = ''
-        postCondition = ''
+        if self.xorOut:
+            # Need to remove the comma from the format.
+            preCondition = '\n    crc = crc ^ %s;' % (fmt[:-1] % self.xorOut)
+            postCondition = preCondition
+        else:
+            preCondition = ''
+            postCondition = ''
+
         if self.digest_size == 3:
             # The 24-bit CRC needs to be conditioned so that only 24-bits are
             # used from the 32-bit variable.
             if self.reverse:
-                preCondition = '\n    crc = crc & 0xFFFFFFU;'
+                preCondition += '\n    crc = crc & 0xFFFFFFU;'
             else:
-                postCondition = '\n    crc = crc & 0xFFFFFFU;'
+                postCondition += '\n    crc = crc & 0xFFFFFFU;'
                 
 
         parms = {
@@ -401,19 +408,20 @@ def _verifyParams(poly, initCrc, xorOut=None):
     out = [sizeBits]
 
     mask = (1L<<sizeBits) - 1
+
     # Adjust the initial CRC to the correct data type (unsigned value).
     initCrc = long(initCrc) & mask
     if mask <= sys.maxint:
         initCrc = int(initCrc)
     out.append(initCrc)
-    # Similar for XOR-out value.
-    if xorOut != None:
-        xorOut = long(xorOut) & mask
-        if mask <= sys.maxint:
-            xorOut = int(xorOut)
-        out.append(xorOut)
-    return out
 
+    # Similar for XOR-out value.
+    xorOut = long(xorOut) & mask
+    if mask <= sys.maxint:
+        xorOut = int(xorOut)
+    out.append(xorOut)
+
+    return out
 
 #-----------------------------------------------------------------------------
 # The following function returns a Python function to compute the CRC.

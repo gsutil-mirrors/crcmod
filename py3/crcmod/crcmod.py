@@ -1,5 +1,6 @@
 #-----------------------------------------------------------------------------
-# Copyright (c) 2009  Raymond L. Buvel
+# Copyright (c) 2010  Raymond L. Buvel
+# Copyright (c) 2010  Craig McQueen
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -235,15 +236,21 @@ class Crc:
         if self.reverse:
             poly = poly + ', bit reverse algorithm'
 
-        preCondition = ''
-        postCondition = ''
+        if self.xorOut:
+            # Need to remove the comma from the format.
+            preCondition = '\n    crc = crc ^ %s;' % (fmt[:-1] % self.xorOut)
+            postCondition = preCondition
+        else:
+            preCondition = ''
+            postCondition = ''
+
         if self.digest_size == 3:
             # The 24-bit CRC needs to be conditioned so that only 24-bits are
             # used from the 32-bit variable.
             if self.reverse:
-                preCondition = '\n    crc = crc & 0xFFFFFFU;'
+                preCondition += '\n    crc = crc & 0xFFFFFFU;'
             else:
-                postCondition = '\n    crc = crc & 0xFFFFFFU;'
+                postCondition += '\n    crc = crc & 0xFFFFFFU;'
                 
 
         parms = {
@@ -383,22 +390,23 @@ del typeCode, size
 # poly, and initial/final XOR values.
 # It returns the size of the CRC (in bits), and "sanitized" initial/final XOR values.
 
-def _verifyParams(poly, initCrc, xorOut=None):
+def _verifyParams(poly, initCrc, xorOut):
     sizeBits = _verifyPoly(poly)
 
     # First return value is the poly size (in bits)
     out = [sizeBits]
 
     mask = (1<<sizeBits) - 1
+
     # Adjust the initial CRC to the correct data type (unsigned value).
     initCrc = initCrc & mask
     out.append(initCrc)
-    # Similar for XOR-out value.
-    if xorOut != None:
-        xorOut = xorOut & mask
-        out.append(xorOut)
-    return out
 
+    # Similar for XOR-out value.
+    xorOut = xorOut & mask
+    out.append(xorOut)
+
+    return out
 
 #-----------------------------------------------------------------------------
 # The following function returns a Python function to compute the CRC.

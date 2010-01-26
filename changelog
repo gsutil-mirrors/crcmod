@@ -1,3 +1,10 @@
+1.6 Enhancement Release - Jan 24, 2010
+
+Enhancements made by Craig McQueen
+
+* Added XOR out feature to allow creation of standard CRC algorithms
+* Added a database of pre-defined CRC algorithms
+
 1.5 Enhancement Release - Mar 7, 2009
 
 * Added Python 3.x version.
