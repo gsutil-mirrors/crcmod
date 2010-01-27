@@ -401,11 +401,8 @@ del typeCode, size
 # poly, and initial/final XOR values.
 # It returns the size of the CRC (in bits), and "sanitized" initial/final XOR values.
 
-def _verifyParams(poly, initCrc, xorOut=None):
+def _verifyParams(poly, initCrc, xorOut):
     sizeBits = _verifyPoly(poly)
-
-    # First return value is the poly size (in bits)
-    out = [sizeBits]
 
     mask = (1L<<sizeBits) - 1
 
@@ -413,15 +410,13 @@ def _verifyParams(poly, initCrc, xorOut=None):
     initCrc = long(initCrc) & mask
     if mask <= sys.maxint:
         initCrc = int(initCrc)
-    out.append(initCrc)
 
     # Similar for XOR-out value.
     xorOut = long(xorOut) & mask
     if mask <= sys.maxint:
         xorOut = int(xorOut)
-    out.append(xorOut)
 
-    return out
+    return (sizeBits, initCrc, xorOut)
 
 #-----------------------------------------------------------------------------
 # The following function returns a Python function to compute the CRC.
