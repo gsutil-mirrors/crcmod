@@ -42,7 +42,7 @@ Name                              Poly                    Reversed?   Init-value
 ``posix``                         0x104C11DB7             False       0xFFFFFFFF            0xFFFFFFFF            0x765E7680
 
 ``crc-64``                        0x1000000000000001B     True        0x0000000000000000    0x0000000000000000    0x46A5A9388A5BEFFE
-``crc-64-jones``                  0x1AD93D23594C935A9     True        0x0000000000000000    0x0000000000000000    0xE9C6D914C4B8D9CA
+``crc-64-jones``                  0x1AD93D23594C935A9     True        0xFFFFFFFFFFFFFFFF    0x0000000000000000    0xCAA717168609F281
 ================================  ======================  ==========  ====================  ====================  ====================
 
 .. rubric:: Notes
