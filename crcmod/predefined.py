@@ -65,15 +65,15 @@ _crc_definitions_table = [
 
     [   'crc-24',           'Crc24',            0x1864CFB,      NON_REVERSE,    0xB704CE,       0x000000,   0x21CF02,   ],
 
-    [   'crc-32',           'Crc32',            0x104c11db7,    REVERSE,        0x00000000,     0xFFFFFFFF, 0xCBF43926, ],
-    [   'crc-32c',          'Crc32C',           0x11edc6f41,    REVERSE,        0x00000000,     0xFFFFFFFF, 0xE3069283, ],
-    [   'crc-32-mpeg',      'Crc32Mpeg',        0x104c11db7,    NON_REVERSE,    0xFFFFFFFF,     0x00000000, 0x0376E6E7, ],
-    [   'posix',            'CrcPosix',         0x104c11db7,    NON_REVERSE,    0xFFFFFFFF,     0xFFFFFFFF, 0x765E7680, ],
+    [   'crc-32',           'Crc32',            0x104C11DB7,    REVERSE,        0x00000000,     0xFFFFFFFF, 0xCBF43926, ],
+    [   'crc-32c',          'Crc32C',           0x11EDC6f41,    REVERSE,        0x00000000,     0xFFFFFFFF, 0xE3069283, ],
+    [   'crc-32-mpeg',      'Crc32Mpeg',        0x104C11DB7,    NON_REVERSE,    0xFFFFFFFF,     0x00000000, 0x0376E6E7, ],
+    [   'posix',            'CrcPosix',         0x104C11DB7,    NON_REVERSE,    0xFFFFFFFF,     0xFFFFFFFF, 0x765E7680, ],
 
 # 64-bit
 #       Name                Identifier-name,    Poly                    Reverse         Init-value          XOR-out             Check
     [   'crc-64',           'Crc64',            0x1000000000000001B,    REVERSE,        0x0000000000000000, 0x0000000000000000, 0x46A5A9388A5BEFFE, ],
-    [   'crc-64-jones',     'Crc64Jones',       0x1ad93d23594c935a9,    REVERSE,        0x0000000000000000, 0x0000000000000000, 0xE9C6D914C4B8D9CA, ],
+    [   'crc-64-jones',     'Crc64Jones',       0x1ad93d23594c935a9,    REVERSE,        0xFFFFFFFFFFFFFFFF, 0x0000000000000000, 0xCAA717168609F281, ],
 ]
 
 
