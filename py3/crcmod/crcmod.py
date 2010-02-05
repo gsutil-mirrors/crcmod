@@ -393,20 +393,15 @@ del typeCode, size
 def _verifyParams(poly, initCrc, xorOut):
     sizeBits = _verifyPoly(poly)
 
-    # First return value is the poly size (in bits)
-    out = [sizeBits]
-
     mask = (1<<sizeBits) - 1
 
     # Adjust the initial CRC to the correct data type (unsigned value).
     initCrc = initCrc & mask
-    out.append(initCrc)
 
     # Similar for XOR-out value.
     xorOut = xorOut & mask
-    out.append(xorOut)
 
-    return out
+    return (sizeBits, initCrc, xorOut)
 
 #-----------------------------------------------------------------------------
 # The following function returns a Python function to compute the CRC.
