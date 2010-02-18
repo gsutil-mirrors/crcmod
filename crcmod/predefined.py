@@ -49,6 +49,9 @@ NON_REVERSE = False
 _crc_definitions_table = [
 #       Name                Identifier-name,    Poly            Reverse         Init-value      XOR-out     Check
     [   'crc-8',            'Crc8',             0x107,          NON_REVERSE,    0x00,           0x00,       0xF4,       ],
+    [   'crc-8-darc',       'Crc8Darc',         0x139,          REVERSE,        0x00,           0x00,       0x15,       ],
+    [   'crc-8-i-code',     'Crc8ICode',        0x11D,          NON_REVERSE,    0xFD,           0x00,       0x7E,       ],
+    [   'crc-8-itu',        'Crc8Itu',          0x107,          NON_REVERSE,    0x55,           0x55,       0xA1,       ],
 
     [   'crc-16',           'Crc16',            0x18005,        REVERSE,        0x0000,         0x0000,     0xBB3D,     ],
     [   'crc-16-usb',       'Crc16Usb',         0x18005,        REVERSE,        0x0000,         0xFFFF,     0xB4C8,     ],
