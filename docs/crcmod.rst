@@ -32,9 +32,10 @@ The function factory provides a simple interface for CRC calculation.
                     those that generate 8, 16, 24, 32, or 64 bit CRCs.
 
    :param initCrc:  Initial value used to start the CRC calculation.  This initial
-                    value should be the initial shift register value XORed with the final XOR
-                    value.  That is equivalent to the CRC result the algorithm should return for
-                    a zero-length string.  Defaults to all bits set because that starting value
+                    value should be the initial shift register value, reversed if it uses a
+                    reversed algorithm, and then XORed with the final XOR value.  That is
+                    equivalent to the CRC result the algorithm should return for a
+                    zero-length string.  Defaults to all bits set because that starting value
                     will take leading zero bytes into account.  Starting with zero will ignore
                     all leading zero bytes.
 
@@ -96,23 +97,24 @@ The class provides an interface similar to the Python :mod:`hashlib`, :mod:`md5`
    
    The parameters are the same as those for the factory function :func:`mkCrcFun`.
 
-   :param poly:    The generator polynomial to use in calculating the CRC.  The value
-                   is specified as a Python integer or long integer.  The bits in this integer
-                   are the coefficients of the polynomial.  The only polynomials allowed are
-                   those that generate 8, 16, 24, 32, or 64 bit CRCs.
+   :param poly:     The generator polynomial to use in calculating the CRC.  The value
+                    is specified as a Python integer or long integer.  The bits in this integer
+                    are the coefficients of the polynomial.  The only polynomials allowed are
+                    those that generate 8, 16, 24, 32, or 64 bit CRCs.
 
-   :param initCrc: Initial value used to start the CRC calculation.  This initial
-                   value should be the initial shift register value XORed with the final XOR
-                   value.  That is equivalent to the CRC result the algorithm should return for
-                   a zero-length string.  Defaults to all bits set because that starting value
-                   will take leading zero bytes into account.  Starting with zero will ignore
-                   all leading zero bytes.
+   :param initCrc:  Initial value used to start the CRC calculation.  This initial
+                    value should be the initial shift register value, reversed if it uses a
+                    reversed algorithm, and then XORed with the final XOR value.  That is
+                    equivalent to the CRC result the algorithm should return for a
+                    zero-length string.  Defaults to all bits set because that starting value
+                    will take leading zero bytes into account.  Starting with zero will ignore
+                    all leading zero bytes.
 
-   :param rev:     A flag that selects a bit reversed algorithm when :keyword:`True`.  Defaults to
-                   :keyword:`True` because the bit reversed algorithms are more efficient.
+   :param rev:      A flag that selects a bit reversed algorithm when :keyword:`True`.  Defaults to
+                    :keyword:`True` because the bit reversed algorithms are more efficient.
 
-   :param xorOut:  Final value to XOR with the calculated CRC value.  Used by some
-                   CRC algorithms.  Defaults to zero.
+   :param xorOut:   Final value to XOR with the calculated CRC value.  Used by some
+                    CRC algorithms.  Defaults to zero.
 
    :class:`Crc` objects contain the following constant values:
 
