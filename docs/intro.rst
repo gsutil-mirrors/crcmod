@@ -89,8 +89,7 @@ install the pure Python version using the following command::
 
    python setup_py.py install
 
-.. note:: The version for Python 3.x is in the :file:`py3` directory.  The install process
-      is the same but you need to use the Python 3.x interpreter.
+For Python 3.x, the install process is the same but you need to use the 3.x interpreter.
 
 ------------
 Unit Testing
