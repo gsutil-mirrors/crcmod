@@ -41,10 +41,41 @@ typedef unsigned long long UINT64;
 // Define some macros for the data format strings.  The INPUT strings are for
 // decoding the input parameters to the function which are (data, crc, table).
 
-#define INPUT8 "s#Bs#"
-#define INPUT16 "s#Hs#"
-#define INPUT32 "s#Is#"
-#define INPUT64 "s#Ks#"
+#define INPUT8 "OBs#"
+#define INPUT16 "OHs#"
+#define INPUT32 "OIs#"
+#define INPUT64 "OKs#"
+
+/*
+ * The following macro is taken from hashlib.h in the Python 3.1 code,
+ * providing "Common code for use by all hashlib related modules".
+ */
+/*
+ * Given a PyObject* obj, fill in the Py_buffer* viewp with the result
+ * of PyObject_GetBuffer.  Sets and exception and issues a return NULL
+ * on any errors.
+ */
+#define GET_BUFFER_VIEW_OR_ERROUT(obj, viewp) do { \
+        if (PyUnicode_Check((obj))) { \
+            PyErr_SetString(PyExc_TypeError, \
+                            "Unicode-objects must be encoded before calculating a CRC");\
+            return NULL; \
+        } \
+        if (!PyObject_CheckBuffer((obj))) { \
+            PyErr_SetString(PyExc_TypeError, \
+                            "object supporting the buffer API required"); \
+            return NULL; \
+        } \
+        if (PyObject_GetBuffer((obj), (viewp), PyBUF_SIMPLE) == -1) { \
+            return NULL; \
+        } \
+        if ((viewp)->ndim > 1) { \
+            PyErr_SetString(PyExc_BufferError, \
+                            "Buffer must be single dimension"); \
+            PyBuffer_Release((viewp)); \
+            return NULL; \
+        } \
+    } while(0);
 
 // Define some macros that extract the specified byte from an integral value in
 // what should be a platform independent manner.
@@ -67,13 +98,15 @@ typedef unsigned long long UINT64;
 static PyObject*
 _crc8(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT8 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT8* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT8, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT8, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -85,11 +118,17 @@ _crc8(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ crc];
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromLong((long)crc);
 }
@@ -108,13 +147,15 @@ _crc8(PyObject* self, PyObject* args)
 static PyObject*
 _crc8r(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT8 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT8* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT8, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT8, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -126,11 +167,17 @@ _crc8r(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ crc];
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromLong((long)crc);
 }
@@ -148,13 +195,15 @@ _crc8r(PyObject* self, PyObject* args)
 static PyObject*
 _crc16(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT16 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT16* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT16, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT16, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -166,11 +215,17 @@ _crc16(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ BYTE1(crc)] ^ (crc << 8);
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromLong((long)crc);
 }
@@ -189,13 +244,15 @@ _crc16(PyObject* self, PyObject* args)
 static PyObject*
 _crc16r(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT16 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT16* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT16, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT16, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -207,11 +264,17 @@ _crc16r(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ BYTE0(crc)] ^ (crc >> 8);
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromLong((long)crc);
 }
@@ -229,13 +292,15 @@ _crc16r(PyObject* self, PyObject* args)
 static PyObject*
 _crc24(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT32 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT32* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT32, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT32, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -247,11 +312,17 @@ _crc24(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ BYTE2(crc)] ^ (crc << 8);
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromLong((long)(crc & 0xFFFFFFU));
 }
@@ -270,13 +341,15 @@ _crc24(PyObject* self, PyObject* args)
 static PyObject*
 _crc24r(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT32 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT32* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT32, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT32, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -288,12 +361,18 @@ _crc24r(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     crc = crc & 0xFFFFFFU;
     while (dataLen--)
     {
         crc = table[*data ^ BYTE0(crc)] ^ (crc >> 8);
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromLong((long)crc);
 }
@@ -311,13 +390,15 @@ _crc24r(PyObject* self, PyObject* args)
 static PyObject*
 _crc32(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT32 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT32* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT32, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT32, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -329,11 +410,17 @@ _crc32(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ BYTE3(crc)] ^ (crc << 8);
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromUnsignedLong(crc);
 }
@@ -352,13 +439,15 @@ _crc32(PyObject* self, PyObject* args)
 static PyObject*
 _crc32r(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT32 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT32* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT32, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT32, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -370,11 +459,17 @@ _crc32r(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ BYTE0(crc)] ^ (crc >> 8);
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromUnsignedLong(crc);
 }
@@ -392,13 +487,15 @@ _crc32r(PyObject* self, PyObject* args)
 static PyObject*
 _crc64(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT64 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT64* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT64, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT64, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -410,11 +507,17 @@ _crc64(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ BYTE7(crc)] ^ (crc << 8);
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromUnsignedLongLong(crc);
 }
@@ -433,13 +536,15 @@ _crc64(PyObject* self, PyObject* args)
 static PyObject*
 _crc64r(PyObject* self, PyObject* args)
 {
+    PyObject *obj;
+    Py_buffer buf;
     UINT64 crc;
     UINT8* data;
     Py_ssize_t dataLen;
     UINT64* table;
     Py_ssize_t tableLen;
 
-    if (!PyArg_ParseTuple(args, INPUT64, &data, &dataLen, &crc,
+    if (!PyArg_ParseTuple(args, INPUT64, &obj, &crc,
                             &table, &tableLen))
     {
         return NULL;
@@ -451,11 +556,17 @@ _crc64r(PyObject* self, PyObject* args)
         return NULL;
     }
 
+    GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
+    data = buf.buf;
+    dataLen = buf.len;
+
     while (dataLen--)
     {
         crc = table[*data ^ BYTE0(crc)] ^ (crc >> 8);
         data++;
     }
+
+    PyBuffer_Release(&buf);
 
     return PyLong_FromUnsignedLongLong(crc);
 }
