@@ -25,63 +25,82 @@
 # SOFTWARE.
 #-----------------------------------------------------------------------------
 
+def _get_buffer_view(in_obj):
+    if isinstance(in_obj, str):
+        raise TypeError('Unicode-objects must be encoded before calculating a CRC')
+    mv = memoryview(in_obj)
+    if mv.ndim > 1:
+        raise BufferError('Buffer must be single dimension')
+    return mv
+
+
 def _crc8(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ crc]
     return crc
 
 def _crc8r(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ crc]
     return crc
 
 def _crc16(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFFFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ ((crc>>8) & 0xFF)] ^ ((crc << 8) & 0xFF00)
     return crc
 
 def _crc16r(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFFFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ (crc & 0xFF)] ^ (crc >> 8)
     return crc
 
 def _crc24(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFFFFFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ (crc>>16 & 0xFF)] ^ ((crc << 8) & 0xFFFF00)
     return crc
 
 def _crc24r(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFFFFFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ (crc & 0xFF)] ^ (crc >> 8)
     return crc
 
 def _crc32(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFFFFFFFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ ((crc>>24) & 0xFF)] ^ ((crc << 8) & 0xFFFFFF00)
     return crc
 
 def _crc32r(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFFFFFFFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ (crc & 0xFF)] ^ (crc >> 8)
     return crc
 
 def _crc64(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFFFFFFFFFFFFFFFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ ((crc>>56) & 0xFF)] ^ ((crc << 8) & 0xFFFFFFFFFFFFFF00)
     return crc
 
 def _crc64r(data, crc, table):
+    mv = _get_buffer_view(data)
     crc = crc & 0xFFFFFFFFFFFFFFFF
-    for x in data:
+    for x in mv.tobytes():
         crc = table[x ^ (crc & 0xFF)] ^ (crc >> 8)
     return crc
 
