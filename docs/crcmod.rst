@@ -10,11 +10,14 @@
 This module provides a function factory :func:`mkCrcFun` and a class :class:`Crc`
 for calculating CRCs of byte strings using common CRC algorithms.
 
-.. note:: This documentation is for Python 2.x usage. Python 3.x usage is very similar,
+.. note:: This documentation normally shows Python 2.x usage. Python 3.x usage is very similar,
     with the main difference that input strings must be explicitly defined as
-    :keyword:`bytes` type. E.g.::
+    :keyword:`bytes` type, or an object that supports the buffer protocol. E.g.::
 
-       crc_value = crc_function(b'123456789')
+       >>> crc_value = crc_function(b'123456789')
+       
+       >>> crc_value = crc_function(bytearray((49, 50, 51, 52, 53, 54, 55, 56, 57)))
+
 
 :func:`mkCrcFun` -- CRC function factory
 ----------------------------------------
@@ -84,6 +87,19 @@ The CRC function can be called multiple times. On subsequent calls, pass the CRC
    >>> crc_value = crc32_func('56789', crc_value)
    >>> hex(crc_value)
    '0xcbf43926L'
+
+Python 3.x example: Unicode strings are not accepted as input. Byte strings are acceptable.
+You may calculate a CRC for an object that implements the buffer protocol::
+
+   >>> import crcmod
+   >>> crc32_func = crcmod.mkCrcFun(0x104c11db7, initCrc=0, xorOut=0xFFFFFFFF)
+   >>> hex(crc32_func('123456789'))
+   ...
+   TypeError: Unicode-objects must be encoded before calculating a CRC
+   >>> hex(crc32_func(b'123456789'))
+   '0xcbf43926'
+   >>> hex(crc32_func(bytearray((49, 50, 51, 52, 53, 54, 55, 56, 57))))
+   '0xcbf43926'
 
 
 Class :class:`Crc`
