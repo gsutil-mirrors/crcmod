@@ -273,27 +273,35 @@ def reference_crc32(d, crc=0):
 
 
 class KnownAnswerTests(unittest.TestCase):
+    test_messages = [
+        'T',
+        'CatMouse987654321',
+    ]
+
     known_answers = [
-        [ (g8,0,0),             0xFE,           0x9D        ],
-        [ (g8,-1,1),            0x4F,           0x9B        ],
-        [ (g8,0,1),             0xFE,           0x62        ],
-        [ (g16,0,0),            0x1A71,         0xE556      ],
-        [ (g16,-1,1),           0x1B26,         0xF56E      ],
-        [ (g16,0,1),            0x14A1,         0xC28D      ],
-        [ (g24,0,0),            0xBCC49D,       0xC4B507    ],
-        [ (g24,-1,1),           0x59BD0E,       0x0AAA37    ],
-        [ (g24,0,1),            0xD52B0F,       0x1523AB    ],
-        [ (g32,0,0),            0x6B93DDDB,     0x12DCA0F4  ],
-        [ (g32,0xFFFFFFFFL,1),  0x41FB859FL,    0xF7B400A7L ],
-        [ (g32,0,1),            0x6C0695EDL,    0xC1A40EE5L ],
-        [ (g32,0,1,0xFFFFFFFF), 0xBE047A60L,    0x084BFF58L ],
+        [ (g8,0,0),             (0xFE,          0x9D)           ],
+        [ (g8,-1,1),            (0x4F,          0x9B)           ],
+        [ (g8,0,1),             (0xFE,          0x62)           ],
+        [ (g16,0,0),            (0x1A71,        0xE556)         ],
+        [ (g16,-1,1),           (0x1B26,        0xF56E)         ],
+        [ (g16,0,1),            (0x14A1,        0xC28D)         ],
+        [ (g24,0,0),            (0xBCC49D,      0xC4B507)       ],
+        [ (g24,-1,1),           (0x59BD0E,      0x0AAA37)       ],
+        [ (g24,0,1),            (0xD52B0F,      0x1523AB)       ],
+        [ (g32,0,0),            (0x6B93DDDB,    0x12DCA0F4)     ],
+        [ (g32,0xFFFFFFFFL,1),  (0x41FB859FL,   0xF7B400A7L)    ],
+        [ (g32,0,1),            (0x6C0695EDL,   0xC1A40EE5L)    ],
+        [ (g32,0,1,0xFFFFFFFF), (0xBE047A60L,   0x084BFF58L)    ],
     ]
 
     def test_known_answers(self):
-        msg = 'CatMouse987654321'
-        for crcfun_params, v0, v1 in self.known_answers:
-            crcfun = mkCrcFun(*crcfun_params)            self.assertEqual(crcfun('',0), 0, "Wrong answer for CRC parameters %s, input ''" % (crcfun_params,))
-            self.assertEqual(crcfun('T'), v0, "Wrong answer for CRC parameters %s, input 'T'" % (crcfun_params,))            self.assertEqual(crcfun(msg), v1, "Wrong answer for CRC parameters %s, input '%s'" % (crcfun_params,msg))            self.assertEqual(crcfun(msg[4:], crcfun(msg[:4])), v1, "Wrong answer for CRC parameters %s, input '%s'" % (crcfun_params,msg))            self.assertEqual(crcfun(msg[-1], crcfun(msg[:-1])), v1, "Wrong answer for CRC parameters %s, input '%s'" % (crcfun_params,msg))
+        for crcfun_params, v in self.known_answers:
+            crcfun = mkCrcFun(*crcfun_params)
+            self.assertEqual(crcfun('',0), 0, "Wrong answer for CRC parameters %s, input ''" % (crcfun_params,))
+            for i, msg in enumerate(self.test_messages):
+                self.assertEqual(crcfun(msg), v[i], "Wrong answer for CRC parameters %s, input '%s'" % (crcfun_params,msg))
+                self.assertEqual(crcfun(msg[4:], crcfun(msg[:4])), v[i], "Wrong answer for CRC parameters %s, input '%s'" % (crcfun_params,msg))
+                self.assertEqual(crcfun(msg[-1:], crcfun(msg[:-1])), v[i], "Wrong answer for CRC parameters %s, input '%s'" % (crcfun_params,msg))
 
 
 class CompareReferenceCrcTest(unittest.TestCase):
@@ -329,8 +337,144 @@ class CompareReferenceCrcTest(unittest.TestCase):
                 self.assertEqual(crcfun(msg), crc_poly_fun(msg))
 
 
+class CrcClassTest(unittest.TestCase):
+    """Verify the Crc class"""
 
-def runtests():    print "Using extension:", _usingExtension
+    msg = 'CatMouse987654321'
+
+    def test_simple_crc32_class(self):
+        """Verify the CRC class when not using xorOut"""
+        crc = Crc(g32)
+
+        str_rep = \
+'''poly = 0x104C11DB7
+reverse = True
+initCrc  = 0xFFFFFFFF
+xorOut   = 0x00000000
+crcValue = 0xFFFFFFFF'''
+        self.assertEqual(str(crc), str_rep)
+        self.assertEqual(crc.digest(), '\xff\xff\xff\xff')
+        self.assertEqual(crc.hexdigest(), 'FFFFFFFF')
+
+        crc.update(self.msg)
+        self.assertEqual(crc.crcValue, 0xF7B400A7L)
+        self.assertEqual(crc.digest(), '\xf7\xb4\x00\xa7')
+        self.assertEqual(crc.hexdigest(), 'F7B400A7')
+
+        # Verify the .copy() method
+        x = crc.copy()
+        self.assertTrue(x is not crc)
+        str_rep = \
+'''poly = 0x104C11DB7
+reverse = True
+initCrc  = 0xFFFFFFFF
+xorOut   = 0x00000000
+crcValue = 0xF7B400A7'''
+        self.assertEqual(str(crc), str_rep)
+        self.assertEqual(str(x), str_rep)
+
+    def test_full_crc32_class(self):
+        """Verify the CRC class when using xorOut"""
+
+        crc = Crc(g32, initCrc=0, xorOut= ~0L)
+
+        str_rep = \
+'''poly = 0x104C11DB7
+reverse = True
+initCrc  = 0x00000000
+xorOut   = 0xFFFFFFFF
+crcValue = 0x00000000'''
+        self.assertEqual(str(crc), str_rep)
+        self.assertEqual(crc.digest(), '\x00\x00\x00\x00')
+        self.assertEqual(crc.hexdigest(), '00000000')
+
+        crc.update(self.msg)
+        self.assertEqual(crc.crcValue, 0x84BFF58L)
+        self.assertEqual(crc.digest(), '\x08\x4b\xff\x58')
+        self.assertEqual(crc.hexdigest(), '084BFF58')
+
+        # Verify the .copy() method
+        x = crc.copy()
+        self.assertTrue(x is not crc)
+        str_rep = \
+'''poly = 0x104C11DB7
+reverse = True
+initCrc  = 0x00000000
+xorOut   = 0xFFFFFFFF
+crcValue = 0x084BFF58'''
+        self.assertEqual(str(crc), str_rep)
+        self.assertEqual(str(x), str_rep)
+
+        # Verify the .new() method
+        y = crc.new()
+        self.assertTrue(y is not crc)
+        self.assertTrue(y is not x)
+        str_rep = \
+'''poly = 0x104C11DB7
+reverse = True
+initCrc  = 0x00000000
+xorOut   = 0xFFFFFFFF
+crcValue = 0x00000000'''
+        self.assertEqual(str(y), str_rep)
+
+
+class PredefinedCrcTest(unittest.TestCase):
+    """Verify the predefined CRCs"""
+
+    test_messages_for_known_answers = [
+        'T',
+        'CatMouse987654321',
+    ]
+
+    known_answers = [
+        [ 'crc-aug-ccitt',  (0xD6ED,        0x5637)         ],
+        [ 'x-25',           (0xE4D9,        0x0A91)         ],
+        [ 'crc-32',         (0xBE047A60,    0x084BFF58)     ],
+    ]
+
+    msg = 'CatMouse987654321'
+
+    def test_known_answers(self):
+        for crcfun_name, v in self.known_answers:
+            crcfun = mkPredefinedCrcFun(crcfun_name)
+            self.assertEqual(crcfun('',0), 0, "Wrong answer for CRC '%s', input ''" % crcfun_name)
+            for i, msg in enumerate(self.test_messages_for_known_answers):
+                self.assertEqual(crcfun(msg), v[i], "Wrong answer for CRC %s, input '%s'" % (crcfun_name,msg))
+                self.assertEqual(crcfun(msg[4:], crcfun(msg[:4])), v[i], "Wrong answer for CRC %s, input '%s'" % (crcfun_name,msg))
+                self.assertEqual(crcfun(msg[-1:], crcfun(msg[:-1])), v[i], "Wrong answer for CRC %s, input '%s'" % (crcfun_name,msg))
+
+    def test_predefined_class(self):
+        # Verify predefined CRC classes
+        crc1 = PredefinedCrc('crc-32')
+        crc1.update(self.msg)
+        self.assertEqual(crc1.crcValue, 0x84BFF58L)
+        crc2 = crc1.new()
+        self.assertEqual(crc1.crcValue, 0x84BFF58L)
+        self.assertEqual(crc2.crcValue, 0x00000000)
+        crc2.update(self.msg)
+        self.assertEqual(crc1.crcValue, 0x84BFF58L)
+        self.assertEqual(crc2.crcValue, 0x84BFF58L)
+
+    def test_function_predefined_table(self):
+        for table_entry in _predefined_crc_definitions:
+            # Check predefined function
+            crc_func = mkPredefinedCrcFun(table_entry['name'])
+            calc_value = crc_func("123456789")
+            self.assertEqual(calc_value, table_entry['check'], "Wrong answer for CRC '%s'" % table_entry['name'])
+
+    def test_class_predefined_table(self):
+        for table_entry in _predefined_crc_definitions:
+            # Check predefined class
+            crc1 = PredefinedCrc(table_entry['name'])
+            crc1.update("123456789")
+            self.assertEqual(crc1.crcValue, table_entry['check'], "Wrong answer for CRC '%s'" % table_entry['name'])
+
+
+def runtests():
+    print "Using extension:", _usingExtension
     print
-    unittest.main()if __name__ == '__main__':
-    runtests()
+    unittest.main()
+
+
+if __name__ == '__main__':
+    runtests()
