@@ -422,17 +422,16 @@ class PredefinedCrcTest(unittest.TestCase):
     """Verify the predefined CRCs"""
 
     test_messages_for_known_answers = [
+        '',                            # Test cases below depend on this first entry being the empty string. 
         'T',
         'CatMouse987654321',
     ]
 
     known_answers = [
-        [ 'crc-aug-ccitt',  (0xD6ED,        0x5637)         ],
-        [ 'x-25',           (0xE4D9,        0x0A91)         ],
-        [ 'crc-32',         (0xBE047A60,    0x084BFF58)     ],
+        [ 'crc-aug-ccitt',  (0x1D0F,        0xD6ED,        0x5637)         ],
+        [ 'x-25',           (0x0000,        0xE4D9,        0x0A91)         ],
+        [ 'crc-32',         (0x00000000,    0xBE047A60,    0x084BFF58)     ],
     ]
-
-    msg = 'CatMouse987654321'
 
     def test_known_answers(self):
         for crcfun_name, v in self.known_answers:
@@ -443,17 +442,26 @@ class PredefinedCrcTest(unittest.TestCase):
                 self.assertEqual(crcfun(msg[4:], crcfun(msg[:4])), v[i], "Wrong answer for CRC %s, input '%s'" % (crcfun_name,msg))
                 self.assertEqual(crcfun(msg[-1:], crcfun(msg[:-1])), v[i], "Wrong answer for CRC %s, input '%s'" % (crcfun_name,msg))
 
-    def test_predefined_class(self):
-        # Verify predefined CRC classes
-        crc1 = PredefinedCrc('crc-32')
-        crc1.update(self.msg)
-        self.assertEqual(crc1.crcValue, 0x84BFF58L)
-        crc2 = crc1.new()
-        self.assertEqual(crc1.crcValue, 0x84BFF58L)
-        self.assertEqual(crc2.crcValue, 0x00000000)
-        crc2.update(self.msg)
-        self.assertEqual(crc1.crcValue, 0x84BFF58L)
-        self.assertEqual(crc2.crcValue, 0x84BFF58L)
+    def test_class_with_known_answers(self):
+        for crcfun_name, v in self.known_answers:
+            for i, msg in enumerate(self.test_messages_for_known_answers):
+                crc1 = PredefinedCrc(crcfun_name)
+                crc1.update(msg)
+                self.assertEqual(crc1.crcValue, v[i], "Wrong answer for crc1 %s, input '%s'" % (crcfun_name,msg))
+
+                crc2 = crc1.new()
+                # Check that crc1 maintains its same value, after .new() call.
+                self.assertEqual(crc1.crcValue, v[i], "Wrong state for crc1 %s, input '%s'" % (crcfun_name,msg))
+                # Check that the new class instance created by .new() contains the initialisation value.
+                # This depends on the first string in self.test_messages_for_known_answers being
+                # the empty string.
+                self.assertEqual(crc2.crcValue, v[0], "Wrong state for crc2 %s, input '%s'" % (crcfun_name,msg))
+
+                crc2.update(msg)
+                # Check that crc1 maintains its same value, after crc2 has called .update()
+                self.assertEqual(crc1.crcValue, v[i], "Wrong state for crc1 %s, input '%s'" % (crcfun_name,msg))
+                # Check that crc2 contains the right value after calling .update()
+                self.assertEqual(crc2.crcValue, v[i], "Wrong state for crc2 %s, input '%s'" % (crcfun_name,msg))
 
     def test_function_predefined_table(self):
         for table_entry in _predefined_crc_definitions:
