@@ -259,19 +259,6 @@ def crc64bp(d):
     return long(p*x64p%g64bp)
 
 
-#-----------------------------------------------------------------------------
-# The binascii module has a 32-bit CRC function that is used in a wide range
-# of applications including the checksum used in the ZIP file format.  This
-# test is to use crcmod to reproduce the same function.
-def reference_crc32(d, crc=0):
-    # Work around the future warning on constants.
-    if crc > 0x7FFFFFFFL:
-        x = int(crc & 0x7FFFFFFFL)
-        crc = x | -2147483648
-    x = binascii.crc32(d,crc)
-    return long(x) & 0xFFFFFFFFL
-
-
 class KnownAnswerTests(unittest.TestCase):
     test_messages = [
         'T',
@@ -307,6 +294,7 @@ class KnownAnswerTests(unittest.TestCase):
 class CompareReferenceCrcTest(unittest.TestCase):
     test_messages = [
         '',
+        'T',
         '123456789',
         'CatMouse987654321',
     ]
@@ -320,14 +308,32 @@ class CompareReferenceCrcTest(unittest.TestCase):
         [ (g64b,0,0),   crc64bp  ],
     ]
 
+    @staticmethod
+    def reference_crc32(d, crc=0):
+        """This function modifies the return value of binascii.crc32
+        to be an unsigned 32-bit value. I.e. in the range 0 to 2**32-1."""
+        # Work around the future warning on constants.
+        if crc > 0x7FFFFFFFL:
+            x = int(crc & 0x7FFFFFFFL)
+            crc = x | -2147483648
+        x = binascii.crc32(d,crc)
+        return long(x) & 0xFFFFFFFFL
+
     def test_compare_crc32(self):
-        # The following function should produce the same result as reference_crc32.
+        """The binascii module has a 32-bit CRC function that is used in a wide range
+        of applications including the checksum used in the ZIP file format.
+        This test compares the CRC-32 implementation of this crcmod module to
+        that of binascii.crc32."""
+        # The following function should produce the same result as
+        # self.reference_crc32 which is derived from binascii.crc32.
         crc32 = mkCrcFun(g32,0,1,0xFFFFFFFF)
 
         for msg in self.test_messages:
-            self.assertEqual(crc32(msg), reference_crc32(msg))
+            self.assertEqual(crc32(msg), self.reference_crc32(msg))
 
     def test_compare_poly(self):
+        """Compare various CRCs of this crcmod module to a pure
+        polynomial-based implementation."""
         for crcfun_params, crc_poly_fun in self.test_poly_crcs:
             # The following function should produce the same result as
             # the associated polynomial CRC function.
