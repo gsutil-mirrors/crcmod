@@ -497,6 +497,8 @@ class InputTypesTest(unittest.TestCase):
     ]
 
     def test_bytearray_input(self):
+        """Test that bytearray inputs are accepted, as an example
+        of a type that implements the buffer protocol."""
         for crc_name in self.check_crc_names:
             crcfun = mkPredefinedCrcFun(crc_name)
             for i in range(len(self.msg) + 1):
@@ -506,6 +508,8 @@ class InputTypesTest(unittest.TestCase):
                 self.assertEqual(bytes_answer, bytearray_answer)
 
     def test_array_input(self):
+        """Test that array inputs are accepted, as an example
+        of a type that implements the buffer protocol."""
         for crc_name in self.check_crc_names:
             crcfun = mkPredefinedCrcFun(crc_name)
             for i in range(len(self.msg) + 1):
@@ -517,6 +521,7 @@ class InputTypesTest(unittest.TestCase):
                         self.assertEqual(bytes_answer, array_answer)
 
     def test_unicode_input(self):
+        """Test that Unicode input raises TypeError"""
         for crc_name in self.check_crc_names:
             crcfun = mkPredefinedCrcFun(crc_name)
             with self.assertRaises(TypeError):
