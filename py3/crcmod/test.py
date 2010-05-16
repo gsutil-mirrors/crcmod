@@ -25,6 +25,7 @@
 
 import unittest
 
+from array import array
 import binascii
 
 from .crcmod import mkCrcFun, Crc
@@ -476,6 +477,50 @@ class PredefinedCrcTest(unittest.TestCase):
             crc1 = PredefinedCrc(table_entry['name'])
             crc1.update(b"123456789")
             self.assertEqual(crc1.crcValue, table_entry['check'], "Wrong answer for CRC '%s'" % table_entry['name'])
+
+
+class InputTypesTest(unittest.TestCase):
+    """Check the various input types that CRC functions can accept."""
+
+    msg = b'CatMouse987654321'
+
+    check_crc_names = [
+        'crc-aug-ccitt',
+        'x-25',
+        'crc-32',
+    ]
+    
+    array_check_types = [
+        [ 'B', 1 ],
+        [ 'H', 2 ],
+        [ 'L', 4 ],
+    ]
+
+    def test_bytearray_input(self):
+        for crc_name in self.check_crc_names:
+            crcfun = mkPredefinedCrcFun(crc_name)
+            for i in range(len(self.msg) + 1):
+                test_msg = self.msg[:i]
+                bytes_answer = crcfun(test_msg)
+                bytearray_answer = crcfun(bytearray(test_msg))
+                self.assertEqual(bytes_answer, bytearray_answer)
+
+    def test_array_input(self):
+        for crc_name in self.check_crc_names:
+            crcfun = mkPredefinedCrcFun(crc_name)
+            for i in range(len(self.msg) + 1):
+                test_msg = self.msg[:i]
+                bytes_answer = crcfun(test_msg)
+                for array_type, array_elem_len in self.array_check_types:
+                    if i % array_elem_len == 0:
+                        array_answer = crcfun(array(array_type, test_msg))
+                        self.assertEqual(bytes_answer, array_answer)
+
+    def test_unicode_input(self):
+        for crc_name in self.check_crc_names:
+            crcfun = mkPredefinedCrcFun(crc_name)
+            with self.assertRaises(TypeError):
+                crcfun("123456789")
 
 
 def runtests():
