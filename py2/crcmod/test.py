@@ -28,10 +28,16 @@ import unittest
 import binascii
 
 from crcmod import mkCrcFun, Crc
-from crcmod import _usingExtension
-from predefined import PredefinedCrc
-from predefined import mkPredefinedCrcFun
-from predefined import _crc_definitions as _predefined_crc_definitions
+try:
+    from crcmod.crcmod import _usingExtension
+    from crcmod.predefined import PredefinedCrc
+    from crcmod.predefined import mkPredefinedCrcFun
+    from crcmod.predefined import _crc_definitions as _predefined_crc_definitions
+except ImportError:
+    from crcmod import _usingExtension
+    from predefined import PredefinedCrc
+    from predefined import mkPredefinedCrcFun
+    from predefined import _crc_definitions as _predefined_crc_definitions
 
 
 #-----------------------------------------------------------------------------
