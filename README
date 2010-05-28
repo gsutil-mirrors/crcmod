@@ -30,6 +30,35 @@ Crc class and replace the method generateCode.  Use generateCode as a model
 for the new version.
 
 ------------
+Dependencies
+------------
+
+Python Version
+^^^^^^^^^^^^^^
+
+The module has separate code to support the 2.x and 3.x Python series.
+
+For the 2.x versions of Python, these versions have been tested:
+
+* 2.4
+* 2.5
+* 2.6
+
+It may still work on earlier versions of Python 2.x, but these have not been
+recently tested.
+
+For the 3.x versions of Python, these versions have been tested:
+
+* 3.1
+
+Building C extension
+^^^^^^^^^^^^^^^^^^^^
+
+To build the C extension, the appropriate compiler tools for your platform must
+be installed. Refer to the Python documentation for building C extensions for
+details.
+
+------------
 Installation
 ------------
 
