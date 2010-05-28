@@ -52,6 +52,7 @@ For the 2.x versions of Python, these versions have been tested:
 * 2.4
 * 2.5
 * 2.6
+* 2.7
 
 It may still work on earlier versions of Python 2.x, but these have not been
 recently tested.
