@@ -11,9 +11,9 @@ found in chapter 20 of the book "Numerical Recipes in C" by Press et. al.
 
 This package allows the use of any 8, 16, 24, 32, or 64 bit CRC.  You can
 generate a Python function for the selected polynomial or an instance of the
-Crc class which provides the same interface as the md5 and sha modules from the
-Python standard library.  A Crc class instance can also generate C/C++ source
-code that can be used in another application.
+Crc class which provides the same interface as the ``md5`` and ``sha`` modules
+from the Python standard library.  A ``Crc`` class instance can also generate
+C/C++ source code that can be used in another application.
 
 ----------
 Guidelines
@@ -23,11 +23,11 @@ Documentation is available from the doc strings.  It is up to you to decide
 what polynomials to use in your application.  If someone has not specified the
 polynomials to use, you will need to do some research to find one suitable for
 your application.  Examples are available in the unit test script
-test_crcmod.py and the timing script timing_test.py.
+``test_crcmod.py`` and the timing script ``timing_test.py``.
 
 If you need to generate code for another language, I suggest you subclass the
-Crc class and replace the method generateCode.  Use generateCode as a model
-for the new version.
+``Crc`` class and replace the method ``generateCode``.  Use ``generateCode`` as
+a model for the new version.
 
 ------------
 Dependencies
@@ -63,15 +63,15 @@ details.
 Installation
 ------------
 
-The crcmod package is installed using distutils.  If you have the tools
-installed to build a Python extension module, run the following command.
+The crcmod package is installed using ``distutils``.  If you have the tools
+installed to build a Python extension module, run the following command::
 
-python setup.py install
+    python setup.py install
 
 If you don't have the tools to build an extension module, you will need to
-install the pure Python version using the following command.
+install the pure Python version using the following command::
 
-python setup_py.py install
+    python setup_py.py install
 
 For Python 3.x, the install process is the same but you need to use the 3.x
 interpreter.
@@ -80,43 +80,49 @@ interpreter.
 Unit Testing
 ------------
 
-The script test_crcmod.py is the unit test for crcmod.  When you first install
-the package, you should run this test to make sure everything is installed
-properly.  This script performs a number of tests including a comparison to the
-direct method which uses a class implementing polynomials over the integers
-mod 2.
+The script ``test_crcmod.py`` is the unit test for ``crcmod``.  When you first
+install the package, you should run this test to make sure everything is
+installed properly.  This script performs a number of tests including a
+comparison to the direct method which uses a class implementing polynomials
+over the integers mod 2.
 
 The unit test script also demonstrates how to use the code generator.  The
-result of this is written out to the file examples.c.  The generated code was
-checked to make sure it compiles with the GCC compiler.
+result of this is written out to the file ``examples.c``.  The generated code
+was checked to make sure it compiles with the GCC compiler.
 
 -------
 License
 -------
 
-The crcmod module is released under the MIT license. See the LICENSE file for
-details.
+The ``crcmod`` module is released under the MIT license. See the ``LICENSE``
+file for details.
 
 ------
 Timing
 ------
 
-A few timing measurements were taken using the timeit module in the Python
+A few timing measurements were taken using the ``timeit`` module in the Python
 standard library.  The Python implementation is compared to the extension
-module, the md5 module in the standard library, and the crc32 function from the
-binascii module.  These measurements were taken on my development system which
-is a 3GHz Pentium IV with hyper threading running the Debian Sarge distribution
-of Linux with the 2.6.6 version of the kernel.  The Python version is 2.3.3.
+module, the ``md5`` module in the standard library, and the ``crc32`` function
+from the ``binascii`` module.  These measurements were taken on my development
+system which is a 3GHz Pentium IV with hyper threading running the Debian Sarge
+distribution of Linux with the 2.6.6 version of the kernel.  The Python version
+is 2.3.3.
 
-The following result was obtained by running the timing_test.py script twice.
-Once with the Python version and once with the extension module.
+The following result was obtained by running the ``timing_test.py`` script
+twice. Once with the Python version and once with the extension module.
 
-Timing in microseconds per iteration
-min and max of 10 repetitions
-  CRC:  14981.4,  15035.8   Python implementation
-  CRC:     64.2,     64.4   extension module
-  md5:     59.0,     59.3
-crc32:     87.2,     87.4
+======================  ============  ============  ==========================
+Module                  min (us)      max (us)      Notes
+======================  ============  ============  ==========================
+``crcmod``              14981.4       15035.8       Pure Python implementation
+``crcmod``              64.2          64.4          C extension module
+``md5``                 59.0          59.3        
+``binascii.crc32``      87.2          87.4        
+======================  ============  ============  ==========================
+
+* Timing in microseconds per iteration
+* min and max of 10 repetitions
 
 It is interesting that on this system, the md5 module is slightly faster than a
 32-bit CRC even though the message digest is 128-bits and is cryptographically
@@ -125,7 +131,8 @@ I tried unrolling the inner loop and using the function interface instead of
 the class interface.  These changes only got the result down to where the MD5
 and CRC took about the same amount of time.
 
-Note: binascii.crc32 is slower than crcmod because it includes a mask operation
-to get the low order byte of a 32-bit word.  A cast is used in the CRC module
-to accomplish the same thing.
+.. note::
+    ``binascii.crc32`` is slower than ``crcmod`` because it includes a mask
+    operation to get the low order byte of a 32-bit word.  A cast is used in
+    the CRC module to accomplish the same thing.
 
