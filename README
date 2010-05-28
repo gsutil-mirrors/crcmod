@@ -60,6 +60,13 @@ The unit test script also demonstrates how to use the code generator.  The
 result of this is written out to the file examples.c.  The generated code was
 checked to make sure it compiles with the GCC compiler.
 
+-------
+License
+-------
+
+The crcmod module is released under the MIT license. See the LICENSE file for
+details.
+
 ------
 Timing
 ------
@@ -88,7 +95,7 @@ I tried unrolling the inner loop and using the function interface instead of
 the class interface.  These changes only got the result down to where the MD5
 and CRC took about the same amount of time.
 
-Note: the crc32 is slower because it includes a mask operation to get the low
-order byte of a 32-bit word.  A cast is used in the CRC module to accomplish
-the same thing.
+Note: binascii.crc32 is slower than crcmod because it includes a mask operation
+to get the low order byte of a 32-bit word.  A cast is used in the CRC module
+to accomplish the same thing.
 
