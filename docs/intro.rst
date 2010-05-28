@@ -24,19 +24,7 @@ code that can be used in another application.
 Guidelines
 ----------
 
-If you are simply looking for something to compute a strong checksum (typically
-referred to as a message digest) over some data, I strongly suggest you use the
-:mod:`md5` module.  As shown in the timing study below, the MD5 algorithm has about
-the same performance as a 32-bit CRC generated with this module.  In addition,
-MD5 is a cryptographically strong message digest.  As discussed in :rfc:`1321`,
-the probability of having the same digest for two data sets is 2\ :sup:`-64` which is
-the same as a 64-bit CRC.  A CRC can be fooled into generating the same value
-by simply adding any multiple of the generator polynomial to the original
-message.  This is very difficult to do with the MD5 algorithm.
-
-If you are still interested in this module, you have an application that
-requires the use of a CRC.  Documentation is available here as well as
-from the doc strings.
+Documentation is available here as well as from the doc strings.
 
 It is up to you to decide what polynomials to use in your application.  Some common
 CRC algorithms are predefined in :mod:`crcmod.predefined`.  If someone has not
