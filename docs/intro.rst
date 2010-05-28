@@ -128,9 +128,10 @@ I tried unrolling the inner loop and using the function interface instead of
 the class interface.  These changes only got the result down to where the MD5
 and CRC took about the same amount of time.
 
-.. note:: :func:`binascii.crc32` is slower because it includes a mask operation to get the low
-      order byte of a 32-bit word.  A cast is used in the CRC module to accomplish
-      the same thing.
+.. note::
+    :func:`binascii.crc32` is slower than :mod:`crcmod` because it includes a
+    mask operation to get the low order byte of a 32-bit word.  A cast is used
+    in the CRC module to accomplish the same thing.
 
 -------
 License
