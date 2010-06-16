@@ -89,17 +89,21 @@ interpreter.
 Unit Testing
 ------------
 
-Tests are in the ``test`` sub-directory.
+The :mod:`crcmod` module has a sub-module :mod:`crcmod.test`, which contains
+unit tests for both :mod:`crcmod` and :mod:`crcmod.predefined`.
 
-The script :file:`test_crcmod.py` is the unit test for :mod:`crcmod`.  When you
-first install the package, you should run this test to make sure everything is
-installed properly.  This script performs a number of tests including a
-comparison to the direct method which uses a class implementing polynomials
-over the integers mod 2.
+When you first install :mod:`crcmod`, you should run the unit tests to make
+sure everything is installed properly.  The unit tests perform a number of
+tests including a comparison to the direct method which uses a class
+implementing polynomials over the integers mod 2.
 
-The unit test script also demonstrates how to use the code generator.  The
-result of this is written out to the file :file:`examples.c`.  The generated
-code was checked to make sure it compiles with the GCC compiler.
+To run the unit tests on Python >=2.5::
+
+    python -m crcmod.test
+
+Alternatively, in the :file:`test` directory run::
+
+    python test_crcmod.py
 
 ------
 Timing
