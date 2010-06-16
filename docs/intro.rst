@@ -146,7 +146,7 @@ License
 
 The :mod:`crcmod` module is released under the MIT license:
 
-   Copyright (c) 2009  Raymond L. Buvel
+   Copyright (c) 2010  Raymond L. Buvel
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to deal
