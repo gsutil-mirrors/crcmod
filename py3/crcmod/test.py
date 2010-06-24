@@ -491,9 +491,10 @@ class InputTypesTest(unittest.TestCase):
     ]
     
     array_check_types = [
-        [ 'B', 1 ],
-        [ 'H', 2 ],
-        [ 'L', 4 ],
+        'B',
+        'H',
+        'I',
+        'L',
     ]
 
     def test_bytearray_input(self):
@@ -515,9 +516,10 @@ class InputTypesTest(unittest.TestCase):
             for i in range(len(self.msg) + 1):
                 test_msg = self.msg[:i]
                 bytes_answer = crcfun(test_msg)
-                for array_type, array_elem_len in self.array_check_types:
-                    if i % array_elem_len == 0:
-                        array_answer = crcfun(array(array_type, test_msg))
+                for array_type in self.array_check_types:
+                    if i % array(array_type).itemsize == 0:
+                        test_array = array(array_type, test_msg)
+                        array_answer = crcfun(test_array)
                         self.assertEqual(bytes_answer, array_answer)
 
     def test_unicode_input(self):
