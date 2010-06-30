@@ -1,7 +1,9 @@
 include README
 include LICENSE
+include MANIFEST.in
 include changelog
 include setup.py
-include setup_py.py
-recursive-include py2 *
-recursive-include py3 *
+recursive-include python2 *
+recursive-include python3 *
+recursive-include test *
+recursive-include docs *

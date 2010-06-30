@@ -22,8 +22,9 @@ Guidelines
 Documentation is available from the doc strings.  It is up to you to decide
 what polynomials to use in your application.  If someone has not specified the
 polynomials to use, you will need to do some research to find one suitable for
-your application.  Examples are available in the unit test script
-``test_crcmod.py`` and the timing script ``timing_test.py``.
+your application.  Examples are available in the unit test script ``test.py``.
+You may also use the ``predefined`` module to select one of the standard
+polynomials.
 
 If you need to generate code for another language, I suggest you subclass the
 ``Crc`` class and replace the method ``generateCode``.  Use ``generateCode`` as
@@ -36,7 +37,7 @@ Dependencies
 Python Version
 ^^^^^^^^^^^^^^
 
-The module has separate code to support the 2.x and 3.x Python series.
+The package has separate code to support the 2.x and 3.x Python series.
 
 For the 2.x versions of Python, these versions have been tested:
 
@@ -63,15 +64,18 @@ details.
 Installation
 ------------
 
-The crcmod package is installed using ``distutils``.  If you have the tools
-installed to build a Python extension module, run the following command::
+The crcmod package is installed using ``distutils``.
+Run the following command::
 
     python setup.py install
 
-If you don't have the tools to build an extension module, you will need to
-install the pure Python version using the following command::
+If the extension module builds, it will be installed.  Otherwise, the
+installation will include the pure Python version.  This will run significantly
+slower than the extension module but will allow the package to be used.
 
-    python setup_py.py install
+For Windows users who want to use the mingw32 compiler, run this command::
+
+    python setup.py build --compiler=mingw32 install
 
 For Python 3.x, the install process is the same but you need to use the 3.x
 interpreter.
@@ -80,11 +84,11 @@ interpreter.
 Unit Testing
 ------------
 
-The ``crcmod`` module has a sub-module ``crcmod.test``, which contains unit
+The ``crcmod`` package has a module ``crcmod.test``, which contains unit
 tests for both ``crcmod`` and ``crcmod.predefined``.
 
 When you first install ``crcmod``, you should run the unit tests to make sure
-everything is installed properly.  The unit tests perform a number of tests
+everything is installed properly.  The test script performs a number of tests
 including a comparison to the direct method which uses a class implementing
 polynomials over the integers mod 2.
 
@@ -96,49 +100,25 @@ Alternatively, in the ``test`` directory run::
 
     python test_crcmod.py
 
+---------------
+Code Generation
+---------------
+
+The crcmod package is capable of generating C functions that can be compiled
+with a C or C++ compiler.  In the test directory, there is an examples.py
+script that demonstrates how to use the code generator.  The result of this is
+written out to the file ``examples.c``.  The generated code was checked to make
+sure it compiles with the GCC compiler.
+
 -------
 License
 -------
 
-The ``crcmod`` module is released under the MIT license. See the ``LICENSE``
+The ``crcmod`` package is released under the MIT license. See the ``LICENSE``
 file for details.
 
-------
-Timing
-------
+------------
+Contributors
+------------
 
-A few timing measurements were taken using the ``timeit`` module in the Python
-standard library.  The Python implementation is compared to the extension
-module, the ``md5`` module in the standard library, and the ``crc32`` function
-from the ``binascii`` module.  These measurements were taken on my development
-system which is a 3GHz Pentium IV with hyper threading running the Debian Sarge
-distribution of Linux with the 2.6.6 version of the kernel.  The Python version
-is 2.3.3.
-
-The following result was obtained by running the ``timing_test.py`` script
-twice. Once with the Python version and once with the extension module.
-
-======================  ============  ============  ==========================
-Module                  min (us)      max (us)      Notes
-======================  ============  ============  ==========================
-``crcmod``              14981.4       15035.8       Pure Python implementation
-``crcmod``              64.2          64.4          C extension module
-``md5``                 59.0          59.3        
-``binascii.crc32``      87.2          87.4        
-======================  ============  ============  ==========================
-
-* Timing in microseconds per iteration
-* min and max of 10 repetitions
-
-It is interesting that on this system, the md5 module is slightly faster than a
-32-bit CRC even though the message digest is 128-bits and is cryptographically
-more secure.  This is surprising since the MD5 code looks a lot more complex.
-I tried unrolling the inner loop and using the function interface instead of
-the class interface.  These changes only got the result down to where the MD5
-and CRC took about the same amount of time.
-
-.. note::
-    ``binascii.crc32`` is slower than ``crcmod`` because it includes a mask
-    operation to get the low order byte of a 32-bit word.  A cast is used in
-    the CRC module to accomplish the same thing.
-
+Craig McQueen

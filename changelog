@@ -1,3 +1,11 @@
+1.7 Enhancement Release - Jun 27, 2010
+
+* Improve the installation process.
+* For Python3 don't allow unicode and require an object that supports the
+  buffer interface.
+* Added Sphinx documentation.
+* Added LICENSE file.
+
 1.6.1 Enhancement Release - Mar 7, 2010
 
 Enhancements made by Craig McQueen

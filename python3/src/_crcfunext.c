@@ -4,7 +4,8 @@
 // will be used by crcmod if it is built for the target platform.  Otherwise,
 // the Python module is used.
 //
-// Copyright (c) 2008  Raymond L. Buvel
+// Copyright (c) 2010  Raymond L. Buvel
+// Copyright (c) 2010  Craig McQueen
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -46,15 +47,12 @@ typedef unsigned long long UINT64;
 #define INPUT32 "OIs#"
 #define INPUT64 "OKs#"
 
-/*
- * The following macro is taken from hashlib.h in the Python 3.1 code,
- * providing "Common code for use by all hashlib related modules".
- */
-/*
- * Given a PyObject* obj, fill in the Py_buffer* viewp with the result
- * of PyObject_GetBuffer.  Sets and exception and issues a return NULL
- * on any errors.
- */
+// The following macro is taken from hashlib.h in the Python 3.1 code,
+// providing "Common code for use by all hashlib related modules".
+
+// Given a PyObject* obj, fill in the Py_buffer* viewp with the result
+// of PyObject_GetBuffer.  Sets an exception and issues a return NULL
+// on any errors.
 #define GET_BUFFER_VIEW_OR_ERROUT(obj, viewp) do { \
         if (PyUnicode_Check((obj))) { \
             PyErr_SetString(PyExc_TypeError, \

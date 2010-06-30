@@ -1,26 +1,27 @@
 from distutils.core import setup
 from distutils.extension import Extension
-import sys
+import sys,os
 
 if sys.version_info[0] == 2:
-    base_dir = 'py2'
+    base_dir = 'python2'
 elif sys.version_info[0] == 3:
-    base_dir = 'py3'
+    base_dir = 'python3'
 
-setup(
+setup_dict = dict(
 name='crcmod',
-version='1.6.1',
+version='1.7',
 description='CRC Generator',
 author='Ray Buvel',
 author_email='rlbuvel@gmail.com',
 url='http://crcmod.sourceforge.net/',
+download_url='http://sourceforge.net/projects/crcmod',
 packages=['crcmod'],
 package_dir={
-    'crcmod' : base_dir + '/crcmod',
+    'crcmod' : os.path.join(base_dir,'crcmod'),
 },
 
 ext_modules=[ 
-    Extension('crcmod._crcfunext', [ base_dir + '/src/_crcfunext.c', ],
+    Extension('crcmod._crcfunext', [os.path.join(base_dir,'src/_crcfunext.c'), ],
     ),
 ],
 
@@ -52,3 +53,14 @@ classifiers=[
     'Topic :: Utilities',
 ],
 )
+
+try:
+    setup(**setup_dict)
+except KeyboardInterrupt:
+    raise
+except:
+    # If there are any compilation errors or there are no build tools available
+    # for the extension module, delete the extension module and try to install
+    # the pure Python version.
+    del setup_dict['ext_modules']
+    setup(**setup_dict)

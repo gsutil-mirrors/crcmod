@@ -81,7 +81,8 @@ Less common is the non-reversed algorithm, as used by the 16-bit **XMODEM** CRC:
    >>> hex(xmodem_crc_func('123456789'))
    '0x31c3'
 
-The CRC function can be called multiple times. On subsequent calls, pass the CRC value previously calculated as a second parameter::
+The CRC function can be called multiple times. On subsequent calls, pass the
+CRC value previously calculated as a second parameter::
 
    >>> crc_value = crc32_func('1234')
    >>> crc_value = crc32_func('56789', crc_value)
